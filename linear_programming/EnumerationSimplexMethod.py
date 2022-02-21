@@ -15,15 +15,16 @@ def converse_to_canonical(positive_indexes, func_coefs, non_neg_coefs, non_pos_c
     :return new_rest_b: вектор правой части ограничений в каноническом виде AX == b
     :return new_func_coefs: вектор коэффициентов функции в каноническом виде f(X) = c' * X
     """
+
     non_neg_matrix = np.matrix(non_neg_coefs)
     non_pos_matrix = np.matrix(non_pos_coefs)
     eq_matrix = np.matrix(eq_coefs)
-    start_vars_count = non_neg_matrix.shape[1]
+    start_vars_count = max(non_neg_matrix.shape[1], eq_matrix.shape[1], non_pos_matrix.shape[1])
     new_rest_b = rest_b.copy()
     new_func_coefs = func_coefs.copy()
 
     # количество новых переменных, которые появятся после превращения неравенств в равенства
-    new_neq_vars_count = non_neg_matrix.shape[0] + non_pos_matrix.shape[0]
+    new_neq_vars_count = len(non_neg_coefs) + len(non_pos_coefs)
 
     for i in range(len(non_neg_matrix)):  # заменяем знаки >= на <= в неравенствах
         new_rest_b[i] *= -1
@@ -31,14 +32,29 @@ def converse_to_canonical(positive_indexes, func_coefs, non_neg_coefs, non_pos_c
             non_neg_matrix[i][j] *= -1
     for i in range(new_neq_vars_count):
         new_func_coefs.append(0)
+
     # объединяем неравенства в общую матрицу вертикально
-    new_matrix = np.vstack((non_neg_matrix, non_pos_matrix))
+    if len(non_pos_coefs) == 0:
+        if len(non_neg_coefs) > 0:
+            new_matrix = non_neg_matrix
+        else:
+            if len(eq_coefs) == 0:
+                return [], [], [], []
+            else:
+                return eq_matrix, np.eye(eq_matrix.shape[1]), new_rest_b, new_func_coefs
+    else:
+        if len(non_neg_coefs) > 0:
+            new_matrix = np.vstack((non_neg_matrix, non_pos_matrix))
+        else:
+            new_matrix = non_pos_matrix
+
     # добавляем единичную матрицу справа, чтобы превратить неравенства в равенства
     new_matrix = np.hstack((new_matrix, np.eye(new_matrix.shape[0])))
     # добавляем к матрице коэффициентов равенств нулевую матрицу справа
-    new_eq_matrix = np.hstack((eq_matrix, np.zeros((eq_matrix.shape[0], new_matrix.shape[1] - eq_matrix.shape[1]))))
-    # объединяем бывшие неравенства с равенствами, получаем квадратную матрицу
-    new_matrix = np.vstack((new_matrix, new_eq_matrix))
+    if len(eq_coefs) > 0:
+        new_eq_matrix = np.hstack((eq_matrix, np.zeros((eq_matrix.shape[0], new_matrix.shape[1] - eq_matrix.shape[1]))))
+        # объединяем бывшие неравенства с равенствами, получаем квадратную матрицу
+        new_matrix = np.vstack((new_matrix, new_eq_matrix))
 
     # замена знаконезависимых переменных
 
@@ -133,7 +149,7 @@ def find_all_vectors(A, b, M, N):
     return vectors
 
 
-def EnumMethod(A, b, c, M, N, transform):
+def EnumMethod(A, b, c, M, N, transform, max=False):
     """
     Метод перебора крайних точек
     :param M: количесво ограничений
@@ -142,8 +158,15 @@ def EnumMethod(A, b, c, M, N, transform):
     :param b: правый вектор ограничений
     :param c: вектор коэффициентов целевой функции
     :param transform: матрица перевода вектора к изначальной задаче (нужно только для логирования)
+    :param max: True если нужно решать задачу максимизации вместо минимизации
     :return: опорный вектор при котором достигается оптимальное решение
     """
+    mult = -1 if max else 1
+
+    if max:
+        for i in range(len(c)):
+            c[i] *= mult
+
     vectors = find_all_vectors(A, b, M, N)
     if len(vectors) == 0:
         return []
@@ -154,16 +177,19 @@ def EnumMethod(A, b, c, M, N, transform):
     min_i = 1
     for tmp in vectors:
         current_val = np.dot(tmp, c)
-        print("step " + str(i) + ":")
-        print(np.dot(transform, np.matrix(tmp).transpose()).transpose().tolist(), '\n', "f(X_" + str(i) + ") =", current_val, '\n')
+        # print("step " + str(i) + ":")
         if (current_val < min):
             min = current_val
             best_vector = tmp
             min_i = i
+        print(np.dot(transform, np.matrix(tmp).transpose() * mult).transpose().tolist(), '\n', "f(X_" + str(i) + ") =",
+              current_val * mult, '\n')
         i += 1
-    print("best vector on step " + str(min_i) + ":\n", np.dot(transform, np.matrix(best_vector).transpose()).transpose().tolist())
 
-    return best_vector
+    print("best vector on step " + str(min_i) + ":\n",
+          np.dot(transform, np.matrix(best_vector).transpose() * mult).transpose().tolist())
+
+    return (np.array(best_vector) * mult).tolist()
 
 
 def print_canon_task_human_readable(A, c, b):
@@ -210,20 +236,22 @@ if __name__ == "__main__":
     # c = [3,-4,2,1,4]
 
     positive = [0, 1, 2]
-    c = [3, -4, 2, 1, 4, 3]
-    bigger = [[2, 9, 1, 0, 3, 0],
-              [4, -1, -2, -3, 10, 1]]
-    less = [[-3, -1, -4, -2, -10, 3]
-            ]
-    equal = [[3, 2, 0, 8, 6, 0],
-             [9, 3, 0, 8, 2, 2],
-             [8, 1, 1, 0, 8, 0]]
-    b = [1, -9, 2, 6, 7, 6]
+    c = [1, -9, -2, 6, 7, 6]
+    bigger = []
+    less = [
+        [2, 4, 3, 3, 9, 8],
+        [9, -1, 1, 2, 3, 1],
+        [1, -2, 4, 0, 0, 1]
+    ]
+    equal = [[0, -3, 2, 8, 8, 0],
+             [3, 10, 10, 6, 2, 8],
+             [0, 1, -3, 0, 2, 0]]
+    b = [3, -4, 2, 1, 4, 3]
 
     new_A, transform, new_b, new_c = converse_to_canonical(positive, c, bigger, less, equal, b)
 
     print_canon_task_human_readable(new_A, new_c, new_b)
 
-    x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform)
+    x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform, True)
     print("\nsolution:", np.dot(transform, x))
     print("f(X) = ", np.dot(new_c, x))
