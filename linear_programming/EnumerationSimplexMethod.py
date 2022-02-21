@@ -177,8 +177,8 @@ def EnumMethod(A, b, c, M, N, transform, max=False):
     min_i = 1
     for tmp in vectors:
         current_val = np.dot(tmp, c)
-        # print("step " + str(i) + ":")
-        if (current_val < min):
+        print("step " + str(i) + ":")
+        if current_val < min:
             min = current_val
             best_vector = tmp
             min_i = i
