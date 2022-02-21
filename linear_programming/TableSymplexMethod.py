@@ -3,7 +3,7 @@ import bisect
 import numpy as np
 
 
-def simplex(A, b, c, var_num, rest_num):
+def simplex(A, b, c, var_num, rest_num, positive_indexes):
     """
     Табличный симплекси метод из Кормена
     :param rest_num: количесво ограничений
@@ -13,12 +13,31 @@ def simplex(A, b, c, var_num, rest_num):
     :param c: вектор коэффициентов целевой функции
     :return: целевой вектор при котором достигается оптимальное решение
     """
+    original_c = list(c)
     N, B, A, b, c, v = initialize_simplex(A, b, c, var_num, rest_num)
 
     delta = list(np.zeros(len(b)))
 
-    while next(filter(lambda j: c[j] > 0, N), 'stop') != 'stop':
-        e = next(filter(lambda i: c[i] > 0, N))
+    f = open('tableMethod.txt', 'w')
+    step = 0
+    while next(filter(lambda j: round(c[j], 16) > 0, N), 'stop') != 'stop':
+        cur_sol = list(np.zeros(len(A[0])))
+        for i in range(len(A[0])):
+            if i in B:
+                cur_sol[i] = b[i]
+
+        j = rest_num
+        for i in list(filter(lambda x: x not in positive_indexes, range(rest_num))):
+            cur_sol[i] -= cur_sol[j]
+            j += 1
+
+        del cur_sol[rest_num:]
+        step += 1
+        f.write(f"\nstep {step}:\nsolution: ")
+        f.writelines(map(lambda y: str(y) + ' ', cur_sol))
+        f.write("\nf_value: " + str(sum(-x * y for (x, y) in zip(cur_sol, original_c))))
+
+        e = next(filter(lambda i: round(c[i], 16) > 0, N))
         min_delta = None
         for i in B:
             if A[i][e] > 0:
@@ -41,7 +60,9 @@ def simplex(A, b, c, var_num, rest_num):
         if i in B:
             solution[i] = b[i]
 
-    return solution
+    f.close()
+
+    return solution, c
 
 
 def pivot(N, B, A, b, c, v, l, e):
@@ -122,8 +143,8 @@ def initialize_simplex(A, b, c, var_num, rest_num):
 
     delta = list(np.zeros(len(b)))
 
-    while next(filter(lambda j: c_new[j] > 0, N), 'stop') != 'stop':
-        e = next(filter(lambda i: c_new[i] > 0, N))
+    while next(filter(lambda q: round(c_new[q], 16) > 0, N), 'stop') != 'stop':
+        e = next(filter(lambda q: round(c_new[q], 16) > 0, N))
         min_delta = None
         for i in B:
             if A[i][e] > 0:
@@ -141,7 +162,7 @@ def initialize_simplex(A, b, c, var_num, rest_num):
         else:
             N, B, A, b, c_new, v = pivot(N, B, A, b, c_new, v, l, e)
 
-    if b[0] == 0:
+    if round(b[0], 16) == 0:
         if 0 in B:
             N, B, A, b, c_new, v = pivot(N, B, A, b, c_new, v, 0, N[0])
         N.remove(0)
@@ -203,11 +224,11 @@ def converse_to_canonical(A, b, c):
     return N, B, A_new, b_new, c, 0
 
 
-def get_optimal_solution(A, b, c, var_num, rest_num):
-    solution = simplex(A, b, c, var_num, rest_num)
-#    fun_value = sum(x * y for (x, y) in zip(solution, c))
+def get_optimal_solution(A, b, c, var_num, rest_num, positive_indexes):
+    solution, c_dual = simplex(A, b, c, var_num, rest_num, positive_indexes)
+    #    fun_value = sum(x * y for (x, y) in zip(solution, c))
 
-    return list(solution)
+    return list(solution), list(c_dual)
 
 
 if __name__ == "__main__":

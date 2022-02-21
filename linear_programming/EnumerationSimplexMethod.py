@@ -144,6 +144,8 @@ def EnumMethod(A, b, c, M, N, transform):
     :param transform: матрица перевода вектора к изначальной задаче (нужно только для логирования)
     :return: опорный вектор при котором достигается оптимальное решение
     """
+    f = open('EnumMethod.txt', 'w')
+
     vectors = find_all_vectors(A, b, M, N)
     if len(vectors) == 0:
         return []
@@ -154,14 +156,22 @@ def EnumMethod(A, b, c, M, N, transform):
     min_i = 1
     for tmp in vectors:
         current_val = np.dot(tmp, c)
-        print("step " + str(i) + ":")
-        print(np.dot(transform, np.matrix(tmp).transpose()).transpose().tolist(), '\n', "f(X_" + str(i) + ") =", current_val, '\n')
-        if (current_val < min):
+        f.write("step " + str(i) + ":\n")
+        f.writelines(map(lambda x: str(x), np.dot(transform, np.matrix(tmp).transpose()).transpose().tolist()[0]))
+        f.write("\nf(X_" + str(i) + ") =" + str(current_val) + '\n')
+        if current_val < min:
             min = current_val
             best_vector = tmp
             min_i = i
         i += 1
-    print("best vector on step " + str(min_i) + ":\n", np.dot(transform, np.matrix(best_vector).transpose()).transpose().tolist())
+    f.write("\nbest vector on step " + str(min_i) + ":\n")
+    f.writelines(map(lambda x: str(x), np.dot(transform, np.matrix(best_vector).transpose()).transpose().tolist()[0]))
+
+    f.write("\n\nsolution:")
+    f.writelines(map(lambda y: str(y), np.dot(transform, best_vector)))
+    f.write("\nf(X) = " + str(np.dot(c, best_vector)))
+
+    f.close()
 
     return best_vector
 
@@ -224,6 +234,8 @@ if __name__ == "__main__":
 
     print_canon_task_human_readable(new_A, new_c, new_b)
 
+    f = open('EnumMethod.txt', 'a')
+
     x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform)
-    print("\nsolution:", np.dot(transform, x))
-    print("f(X) = ", np.dot(new_c, x))
+
+
