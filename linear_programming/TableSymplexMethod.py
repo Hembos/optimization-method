@@ -195,7 +195,7 @@ def converse_to_canonical(A, b, c):
 
     A_new = np.zeros((n + m, n + m))
     for i in B:
-        for j in N:
+        for j  in N:
             A_new[i][j] = A[i - n][j]
 
     b_new = np.zeros(n + m)
@@ -225,7 +225,8 @@ if __name__ == "__main__":
     ]
 
     b = [30, 24, 36]
-    c = [3, -4, 2, 1, 4]
+    c = [3, 1, 2]
+
     v = 0
     e = 0
     l = 5
