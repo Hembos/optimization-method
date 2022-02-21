@@ -17,8 +17,8 @@ def simplex(A, b, c, var_num, rest_num):
 
     delta = list(np.zeros(len(b)))
 
-    while next(filter(lambda j: c[j] < 0, N), 'stop') != 'stop':
-        e = next(filter(lambda i: c[i] < 0, N))
+    while next(filter(lambda j: c[j] > 0, N), 'stop') != 'stop':
+        e = next(filter(lambda i: c[i] > 0, N))
         min_delta = None
         for i in B:
             if A[i][e] > 0:
@@ -26,12 +26,10 @@ def simplex(A, b, c, var_num, rest_num):
             else:
                 delta[i] = None
 
-            if min_delta == None:
+        for i in B:
+            if min_delta is None or (delta[i] is not None and min_delta > delta[i]):
                 min_delta = delta[i]
-            elif min_delta > delta[i]:
-                min_delta = delta[i]
-
-        l = delta.index(min_delta)
+                l = i
 
         if min_delta is None:
             raise ValueError('Задача неограничена')
@@ -124,8 +122,8 @@ def initialize_simplex(A, b, c, var_num, rest_num):
 
     delta = list(np.zeros(len(b)))
 
-    while next(filter(lambda j: c_new[j] < 0, N), 'stop') != 'stop':
-        e = next(filter(lambda i: c_new[i] < 0, N))
+    while next(filter(lambda j: c_new[j] > 0, N), 'stop') != 'stop':
+        e = next(filter(lambda i: c_new[i] > 0, N))
         min_delta = None
         for i in B:
             if A[i][e] > 0:
@@ -133,12 +131,10 @@ def initialize_simplex(A, b, c, var_num, rest_num):
             else:
                 delta[i] = None
 
-            if min_delta == None:
+        for i in B:
+            if min_delta is None or (delta[i] is not None and min_delta > delta[i]):
                 min_delta = delta[i]
-            elif min_delta > delta[i]:
-                min_delta = delta[i]
-
-        l = delta.index(min_delta)
+                l = i
 
         if min_delta is None:
             raise ValueError('Задача неограничена')
@@ -195,7 +191,7 @@ def converse_to_canonical(A, b, c):
 
     A_new = np.zeros((n + m, n + m))
     for i in B:
-        for j  in N:
+        for j in N:
             A_new[i][j] = A[i - n][j]
 
     b_new = np.zeros(n + m)
@@ -209,27 +205,31 @@ def converse_to_canonical(A, b, c):
 
 def get_optimal_solution(A, b, c, var_num, rest_num):
     solution = simplex(A, b, c, var_num, rest_num)
-    fun_value = sum(x * y for (x, y) in zip(solution, c))
+#    fun_value = sum(x * y for (x, y) in zip(solution, c))
 
-    return list(solution), fun_value
+    return list(solution)
 
 
 if __name__ == "__main__":
-    B = [3, 4, 5]
-    N = [0, 1, 2]
+    c = [-2, 3, -3]
+    A = [[1, 1, -1], [-1, -1, 1], [1, -2, 2]]
+    b = [7, -7, 4]
 
-    A = [
-        [1, 1, 3],
-        [2, 2, 5],
-        [4, 1, 2]
-    ]
-
-    b = [30, 24, 36]
-    c = [3, 1, 2]
-
-    v = 0
-    e = 0
-    l = 5
+    # B = [3, 4, 5]
+    # N = [0, 1, 2]
+    #
+    # A = [
+    #     [1, 1, 3],
+    #     [2, 2, 5],
+    #     [4, 1, 2]
+    # ]
+    #
+    # b = [30, 24, 36]
+    # c = [3, 1, 2]
+    #
+    # v = 0
+    # e = 0
+    # l = 5
 
     # B = [3, 4]
     # N = [0, 1]
@@ -244,5 +244,7 @@ if __name__ == "__main__":
     # v = 0
     # e = 0
     # l = 5
-    #
-    print(get_optimal_solution(A, b, c, 3, 3))
+
+    solution = get_optimal_solution(A, b, c, 3, 3)
+    c = [2, -3, 3]
+    print(solution, sum(x * y for (x, y) in zip(solution, c)))

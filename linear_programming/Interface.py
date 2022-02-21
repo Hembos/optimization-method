@@ -1,19 +1,30 @@
 import PySimpleGUI as sg
+from TaskConversion import conversion_to_standart
+import TableSymplexMethod
 
 
 class Interface:
     def __init__(self):
-        self.__var_num = None
-        self.__non_neg_rest_num = None
-        self.__non_pos_rest_num = None
-        self.__eq_rest_num = None
+        self.c = None
+        self.b = None
+        self.A = None
+        self.__default = True
 
-        self.__positive_indexes = []
-        self.__func_coefs = []
-        self.__non_neg_coefs = []
-        self.__non_pos_coefs = []
-        self.__eq_coefs = []
-        self.__rest_b = []
+        self.__var_num = 6
+        self.__non_neg_rest_num = 2
+        self.__non_pos_rest_num = 1
+        self.__eq_rest_num = 3
+
+        self.__positive_indexes = [0, 1, 2]
+        self.__func_coefs =       [3, -4, 2, 1, 4, 3]
+        self.__non_neg_coefs =    [[2, 9, 1, 0, 3, 0],
+                                   [4, -1, -2, -3, 10, 1]]
+        self.__non_pos_coefs =    [[-3, -1, -4, -2, -10, 3]
+                                  ]
+        self.__eq_coefs =         [[3, 2, 0, 8, 6, 0],
+                                  [9, 3, 0, 8, 2, 2],
+                                  [8, 1, 1, 0, 8, 0]]
+        self.__rest_b =           [1, -9, 2, 6, 7, 6]
 
         self.__entering_func_window = None
         self.__main_window = self.__create_main_window()
@@ -93,19 +104,20 @@ class Interface:
         return sg.Window("Function and restricts", layout, finalize=True)
 
     def create_task(self, values):
-        for i in range(self.__non_neg_rest_num):
-            self.__non_neg_coefs.append([float(x) for x in values[i].split(' ')])
+        if self.__default is False:
+            for i in range(self.__non_neg_rest_num):
+                self.__non_neg_coefs.append([float(x) for x in values[i].split(' ')])
 
-        for i in range(self.__non_neg_rest_num, self.__non_neg_rest_num + self.__non_pos_rest_num):
-            self.__non_pos_coefs.append([float(x) for x in values[i].split(' ')])
+            for i in range(self.__non_neg_rest_num, self.__non_neg_rest_num + self.__non_pos_rest_num):
+                self.__non_pos_coefs.append([float(x) for x in values[i].split(' ')])
 
-        for i in range(self.__non_neg_rest_num + self.__non_pos_rest_num,
-                       self.__non_neg_rest_num + self.__non_pos_rest_num + self.__eq_rest_num):
-            self.__eq_coefs.append([float(x) for x in values[i].split(' ')])
+            for i in range(self.__non_neg_rest_num + self.__non_pos_rest_num,
+                           self.__non_neg_rest_num + self.__non_pos_rest_num + self.__eq_rest_num):
+                self.__eq_coefs.append([float(x) for x in values[i].split(' ')])
 
-        self.__func_coefs = [float(x) for x in values["func_coefs"].split()]
-        self.__positive_indexes = [float(x) for x in values["positive_var_num"].split()]
-        self.__rest_b = [float(x) for x in values["rest_b"].split()]
+            self.__func_coefs = [float(x) for x in values["func_coefs"].split(' ')]
+            self.__positive_indexes = [int(x) for x in self.__positive_indexes]
+            self.__rest_b = [float(x) for x in values["rest_b"].split(' ')]
 
     def main_loop(self):
         while True:
@@ -118,6 +130,7 @@ class Interface:
                     self.__entering_func_window = None
 
             if event == "var_num":
+                self.__default = False
                 self.__var_num = int(values["var_num"])
             elif event == "restrictions_num_>=":
                 self.__non_neg_rest_num = int(values["restrictions_num_>="])
@@ -125,8 +138,20 @@ class Interface:
                 self.__non_pos_rest_num = int(values["restrictions_num_<="])
             elif event == "restrictions_num_=":
                 self.__eq_rest_num = int(values["restrictions_num_="])
+            elif event == "positive_var_num":
+                self.__positive_indexes = values["positive_var_num"].split(' ')
             elif event == "Ввести функцию и ограничения":
                 self.__entering_func_window = self.__create_entering_func_window()
             elif event == "Создать":
                 self.create_task(values)
-
+                self.A, self.b, self.c = conversion_to_standart(self.__var_num, self.__positive_indexes,
+                                                                self.__non_neg_coefs,
+                                                                self.__non_pos_coefs, self.__eq_coefs,
+                                                                self.__func_coefs,
+                                                                self.__rest_b)
+                window.close()
+                self.__entering_func_window = None
+            elif event == "Решить":
+                solution = TableSymplexMethod.get_optimal_solution(self.A, self.b, [-x for x in self.c], self.__var_num,
+                                                                   len(self.A))
+                print(solution, sum(x * y for (x, y) in zip(solution, self.c)))
