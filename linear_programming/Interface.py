@@ -10,21 +10,39 @@ class Interface:
         self.A = None
         self.__default = True
 
+        # self.__var_num = 6
+        # self.__non_neg_rest_num = 1
+        # self.__non_pos_rest_num = 2
+        # self.__eq_rest_num = 3
+        #
+        # self.__positive_indexes = [0, 1, 2]
+        # self.__func_coefs = [1, -9, 2, 6, 7, 6]
+        # self.__non_neg_coefs = []
+        # self.__non_pos_coefs = [[1, -2, -4, 0, 0, 1],
+        #                         [2, 4, -3, 3, 9, 8],
+        #                         [9, -1, -1, 2, 3, 1]
+        #                         ]
+        # self.__eq_coefs = [[0, -3, -2, 8, 8, 0],
+        #                    [1, 10, -10, 6, 2, 8],
+        #                    [0, 1, 3, 0, 2, 0]]
+        # self.__rest_b = [2, 3, -4, 1, 4, 3]
+
         self.__var_num = 6
-        self.__non_neg_rest_num = 2
-        self.__non_pos_rest_num = 1
+        self.__non_neg_rest_num = 3
+        self.__non_pos_rest_num = 0
         self.__eq_rest_num = 3
 
         self.__positive_indexes = [0, 1, 2]
-        self.__func_coefs =       [3, -4, 2, 1, 4, 3]
-        self.__non_neg_coefs =    [[2, 9, 1, 0, 3, 0],
-                                   [4, -1, -2, -3, 10, 1]]
-        self.__non_pos_coefs =    [[-3, -1, -4, -2, -10, 3]
-                                  ]
-        self.__eq_coefs =         [[3, 2, 0, 8, 6, 0],
-                                  [9, 3, 0, 8, 2, 2],
-                                  [8, 1, 1, 0, 8, 0]]
-        self.__rest_b =           [1, -9, 2, 6, 7, 6]
+        self.__func_coefs = [3, -4, 2, 1, 4, 3]
+        self.__non_neg_coefs = [[2, 9, 1, 0, 3, 0],
+                                [4, -1, -2, -3, 10, 1],
+                                [3, 1, 4, 2, 10, -3]]
+        self.__non_pos_coefs = [
+                                ]
+        self.__eq_coefs = [[3, 2, 0, 8, 6, 0],
+                           [9, 3, 0, 8, 2, 2],
+                           [8, 1, 1, 0, 8, 0]]
+        self.__rest_b = [1, -9, -2, 6, 7, 6]
 
         self.__entering_func_window = None
         self.__main_window = self.__create_main_window()
@@ -152,6 +170,13 @@ class Interface:
                 window.close()
                 self.__entering_func_window = None
             elif event == "Решить":
-                solution = TableSymplexMethod.get_optimal_solution(self.A, self.b, [-x for x in self.c], self.__var_num,
+                solution = TableSymplexMethod.get_optimal_solution(self.A, list(self.b), [-x for x in self.c],
+                                                                   self.__var_num,
                                                                    len(self.A))
-                print(solution, sum(x * y for (x, y) in zip(solution, self.c)))
+                j = self.__var_num
+                for i in list(filter(lambda x: x not in self.__positive_indexes, range(self.__var_num))):
+                    solution[i] -= solution[j]
+                    j += 1
+                del solution[self.__var_num:]
+                print(solution)
+                print(sum(x * y for (x, y) in zip(solution, self.c)))

@@ -31,8 +31,6 @@ def conversion_to_standart(num_var, positive_indexes, non_neg_coefs, non_pos_coe
                                                                                                                eq_coefs,
                                                                                                                func_coefs)
     i = 0
-    num_non_pos = len(non_pos_coefs)
-
     A = []
     b = []
 
@@ -56,18 +54,25 @@ def conversion_to_standart(num_var, positive_indexes, non_neg_coefs, non_pos_coe
     return A, b, func_coefs
 
 
-if __name__ == "__main__":
-    num_var = 6
-    positive_indexes = [0, 1, 2]
-    non_neg_coefs = []
-    non_pos_coefs = [[2, 9, 1, 0, 3, 1],
-     [-3, -1, 5, 2, -7, 2],
-     [4, 7, 3, 1, -2, 5]]
-    eq_coefs = [[4, 5, 10, 4, -3, 1],
-     [0, 4, 2, 5, 2, -1],
-     [2, 3, 1, 7, 2, -1]]
-    func_coefs = [3, -4, 2, 1, 4, 7]
-    rest_b = [1, -9, 5, 7, 3, 2]
+def get_dual_task(num_var, positive_indexes, non_neg_coefs, non_pos_coefs, eq_coefs, func_coefs, rest_b):
+    dual_num_var = len(rest_b)
+    dual_func_coefs = list(rest_b)
+    dual_rest_b = list(func_coefs)
 
-    print(conversion_to_standart(num_var, positive_indexes, non_neg_coefs, non_pos_coefs, eq_coefs, func_coefs, rest_b))
 
+
+
+# if __name__ == "__main__":
+#     num_var = 6
+#     positive_indexes = [0, 1, 2]
+#     non_neg_coefs = []
+#     non_pos_coefs = [[2, 9, 1, 0, 3, 1],
+#                      [-3, -1, 5, 2, -7, 2],
+#                      [4, 7, 3, 1, -2, 5]]
+#     eq_coefs = [[4, 5, 10, 4, -3, 1],
+#                 [0, 4, 2, 5, 2, -1],
+#                 [2, 3, 1, 7, 2, -1]]
+#     func_coefs = [3, -4, 2, 1, 4, 7]
+#     rest_b = [1, -9, 5, 7, 3, 2]
+#
+#     print(conversion_to_standart(num_var, positive_indexes, non_neg_coefs, non_pos_coefs, eq_coefs, func_coefs, rest_b))
