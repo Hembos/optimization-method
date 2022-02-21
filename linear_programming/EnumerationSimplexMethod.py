@@ -225,6 +225,40 @@ def print_canon_task_human_readable(A, c, b):
     print(s)
 
 
+def convertToDual(positive_indexes, func_coefs, non_neg_coefs, non_pos_coefs, eq_coefs, b):
+    # 1
+    new_c = b
+    # 2
+    new_b = func_coefs
+    # 3
+    A = []
+    new_positive_indexes = []
+    for i in range(len(non_neg_coefs)):
+        new_positive_indexes.append(i)
+        row = (np.array(non_neg_coefs[i])).tolist()
+        A.append(row)
+    positive_indexes_count = len(new_positive_indexes)
+
+    for i in range(len(non_pos_coefs)):
+        A.append(non_pos_coefs[i])
+        new_positive_indexes.append(i + positive_indexes_count)
+
+    for i in eq_coefs:
+        A.append(i)
+    A = np.matrix(A).transpose().tolist()
+
+    new_non_neg_coefs = []
+    new_eq_coefs = []
+
+    for i in range(len(func_coefs)):
+        if i in positive_indexes:
+            new_non_neg_coefs.append(A[i])
+        else:
+            new_eq_coefs.append(A[i])
+
+    return new_positive_indexes, new_c, new_non_neg_coefs, [], new_eq_coefs, new_b
+
+
 if __name__ == "__main__":
     # positive = [0,1,2,4]
     # bigger = [[2,9,1,0,3]]
@@ -235,23 +269,53 @@ if __name__ == "__main__":
     # b = [1,-9,6,7,6]
     # c = [3,-4,2,1,4]
 
-    positive = [0, 1, 2]
-    c = [1, -9, -2, 6, 7, 6]
-    bigger = []
-    less = [
-        [2, 4, 3, 3, 9, 8],
-        [9, -1, 1, 2, 3, 1],
-        [1, -2, 4, 0, 0, 1]
+    # positive = [0, 1, 2]
+    # c = [1, -9, -2, 6, 7, 6]
+    # bigger = []
+    # less = [
+    #     [2, 4, 3, 3, 9, 8],
+    #     [9, -1, 1, 2, 3, 1],
+    #     [1, -2, 4, 0, 0, 1]
+    # ]
+    # equal = [[0, -3, 2, 8, 8, 0],
+    #          [3, 10, 10, 6, 2, 8],
+    #          [0, 1, -3, 0, 2, 0]]
+    # b = [3, -4, 2, 1, 4, 3]
+
+    # new_A, transform, new_b, new_c = converse_to_canonical(positive, c, bigger, less, equal, b)
+    # convertToDual(positive, c, bigger, less, equal, b)
+
+    # print_canon_task_human_readable(new_A, new_c, new_b)
+
+    # x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform, True)
+    # print("\nsolution:", np.dot(transform, x))
+    # print("f(X) = ", np.dot(new_c, x))
+    positive_indexes = [0, 1, 2]
+    func_coefs = [3, -4, 2, 1, 4, 3]
+    non_neg_coefs = [[2, 9, 1, 0, 3, 0],
+                     [4, -1, -2, -3, 10, 1],
+                     [3, 1, 4, 2, 10, -3]]
+    non_pos_coefs = [
+
     ]
-    equal = [[0, -3, 2, 8, 8, 0],
-             [3, 10, 10, 6, 2, 8],
-             [0, 1, -3, 0, 2, 0]]
-    b = [3, -4, 2, 1, 4, 3]
+    eq_coefs = [[3, 2, 0, 8, 6, 0],
+                [9, 3, 0, 8, 2, 2],
+                [8, 1, 1, 0, 8, 0]]
+    rest_b = [1, -9, -2, 6, 7, 6]
 
-    new_A, transform, new_b, new_c = converse_to_canonical(positive, c, bigger, less, equal, b)
+    positive_indexes, func_coefs, non_pos_coefs, non_neg_coefs, eq_coefs, rest_b = convertToDual(positive_indexes,
+                                                                                                 func_coefs,
+                                                                                                 non_neg_coefs,
+                                                                                                 non_pos_coefs,
+                                                                                                 eq_coefs, rest_b)
+    print("positive_indexes", positive_indexes)
+    print("func_coefs", func_coefs)
+    print("non_neg_coefs", non_neg_coefs)
+    print("non_pos_coefs", non_pos_coefs)
+    print("eq_coefs", eq_coefs)
+    print("rest_b", rest_b)
 
-    print_canon_task_human_readable(new_A, new_c, new_b)
+    new_A, transform, new_b, new_c = converse_to_canonical(positive_indexes, func_coefs, non_neg_coefs, non_pos_coefs,
+                                                           eq_coefs, rest_b)
 
     x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform, True)
-    print("\nsolution:", np.dot(transform, x))
-    print("f(X) = ", np.dot(new_c, x))
