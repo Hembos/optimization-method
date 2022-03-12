@@ -157,7 +157,7 @@ def EnumMethod(A, b, c, M, N, transform):
     for tmp in vectors:
         current_val = np.dot(tmp, c)
         f.write("step " + str(i) + ":\n")
-        f.writelines(map(lambda x: str(x), np.dot(transform, np.matrix(tmp).transpose()).transpose().tolist()[0]))
+        f.writelines(map(lambda x: str(x) + ' ', np.dot(transform, np.matrix(tmp).transpose()).transpose().tolist()[0]))
         f.write("\nf(X_" + str(i) + ") =" + str(current_val) + '\n')
         if current_val < min:
             min = current_val
@@ -165,10 +165,10 @@ def EnumMethod(A, b, c, M, N, transform):
             min_i = i
         i += 1
     f.write("\nbest vector on step " + str(min_i) + ":\n")
-    f.writelines(map(lambda x: str(x), np.dot(transform, np.matrix(best_vector).transpose()).transpose().tolist()[0]))
+    f.writelines(map(lambda x: str(x) + ' ', np.dot(transform, np.matrix(best_vector).transpose()).transpose().tolist()[0]))
 
     f.write("\n\nsolution:")
-    f.writelines(map(lambda y: str(y), np.dot(transform, best_vector)))
+    f.writelines(map(lambda y: str(y) + ' ', np.dot(transform, best_vector)))
     f.write("\nf(X) = " + str(np.dot(c, best_vector)))
 
     f.close()
