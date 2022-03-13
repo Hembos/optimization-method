@@ -3,6 +3,8 @@ import traceback
 import PySimpleGUI as sg
 from TaskConversion import conversion_to_standart
 import TableSymplexMethod
+from EnumerationSimplexMethod import converse_to_canonical
+from EnumerationSimplexMethod import EnumMethod
 
 
 class Interface:
@@ -160,9 +162,9 @@ class Interface:
 
     def solve(self):
         self.A, self.b, self.c = conversion_to_standart(self.__var_num, self.__positive_indexes,
-                                                         self.__non_neg_rest_num, self.__non_pos_rest_num,
-                                                         self.__eq_rest_num, self.__func_coefs,
-                                                         self.__rest_b, self.__rest_coefs)
+                                                        self.__non_neg_rest_num, self.__non_pos_rest_num,
+                                                        self.__eq_rest_num, self.__func_coefs,
+                                                        self.__rest_b, self.__rest_coefs)
         """Здесь решается симплекс методом"""
         solution = TableSymplexMethod.get_optimal_solution(self.A, self.b, [-x for x in self.c])
         solution_value = sum(x * y for (x, y) in zip(solution, self.c))
@@ -177,10 +179,17 @@ class Interface:
         print(solution)
         print(solution_value)
 
-
         ##################################
         """Здесь решается переборным методом"""
 
+        new_A, transform, new_b, new_c = converse_to_canonical(self.__var_num, self.__non_neg_rest_num,
+                                                               self.__non_pos_rest_num, self.__eq_rest_num,
+                                                               self.__positive_indexes, self.__func_coefs,
+                                                               self.__rest_coefs, self.__rest_b)
+
+        x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform)
+
+        print(x)
         ##################################
 
     def main_loop(self):
