@@ -4,12 +4,11 @@ import numpy as np
 
 def converse_to_canonical(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, positive_indexes, func_coefs,
                           rest_coefs, rest_b):
-
     #############################
-    #начальная проверка
-    #проверка количества переменных
-    #проверка пустоты матрицы
-    #проверка соответствия вектора правой части
+    # начальная проверка
+    # проверка количества переменных
+    # проверка пустоты матрицы
+    # проверка соответствия вектора правой части
     #############################
 
     start_vars_count = var_num
@@ -17,20 +16,20 @@ def converse_to_canonical(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_n
     new_rest_b = rest_b.copy()
     new_func_coefs = func_coefs.copy()
 
-    #заменяем >= на <=
+    # заменяем >= на <=
     for i in range(non_neg_rest_num):
         for j in range(len(new_rest_coefs[i])):
             new_rest_coefs[i][j] *= -1
         new_rest_b[i] *= -1
 
     # количество новых переменных, которые появятся после превращения неравенств в равенства
-    new_neq_vars_count = non_neg_rest_num + non_pos_rest_num;
+    new_neq_vars_count = non_neg_rest_num + non_pos_rest_num
 
     for i in range(new_neq_vars_count):
         new_func_coefs.append(0)
 
     new_matrix = np.matrix(rest_coefs)
-    #добавляем справа от неравенств единичную квадратную матрицу, оставшееся пространство заполняем нулями
+    # добавляем справа от неравенств единичную квадратную матрицу, оставшееся пространство заполняем нулями
     right_matrix = np.eye(new_neq_vars_count)
     if eq_rest_num > 0:
         right_matrix = np.vstack((right_matrix, np.zeros((eq_rest_num, new_neq_vars_count))))
@@ -213,65 +212,66 @@ def print_canon_task_human_readable(A, c, b):
     print(s)
 
 
-def convertToDual(positive_indexes, func_coefs, non_neg_coefs, non_pos_coefs, eq_coefs, b):
+def convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, positive_indexes, func_coefs,
+                  rest_coefs, rest_b):
     # 1
-    new_c = b
+    new_func_coefs = rest_b
     # 2
-    new_b = func_coefs
+    new_rest_b = func_coefs
     # 3
+    new_var_num = non_neg_rest_num + non_pos_rest_num + eq_rest_num
+    new_non_neg_rest_num = 0
+    new_non_pos_rest_num = 0
+    new_eq_rest_num = 0
     A = []
     new_positive_indexes = []
-    for i in range(len(non_neg_coefs)):
+    for i in range(non_neg_rest_num):
         new_positive_indexes.append(i)
-        row = (np.array(non_neg_coefs[i])).tolist()
+        row = (np.array(rest_coefs[i])).tolist()
         A.append(row)
     positive_indexes_count = len(new_positive_indexes)
 
-    for i in range(len(non_pos_coefs)):
-        A.append(non_pos_coefs[i])
+    for i in range(non_pos_rest_num):
+        A.append(rest_coefs[i + non_neg_rest_num])
         new_positive_indexes.append(i + positive_indexes_count)
 
-    for i in eq_coefs:
-        A.append(i)
+    for i in range(eq_rest_num):
+        A.append(rest_coefs[i + non_neg_rest_num + non_pos_rest_num])
     A = np.matrix(A).transpose().tolist()
 
-    new_non_neg_coefs = []
-    new_eq_coefs = []
-
-    for i in range(len(func_coefs)):
+    new_rest_coefs = []
+    buf = []
+    for i in range(len(A)):
         if i in positive_indexes:
-            new_non_neg_coefs.append(A[i])
+            new_rest_coefs.append(A[i])
+            new_non_neg_rest_num += 1
         else:
-            new_eq_coefs.append(A[i])
+            buf.append(A[i])
+            new_eq_rest_num += 1
 
-    return new_positive_indexes, new_c, new_non_neg_coefs, [], new_eq_coefs, new_b
+    for i in buf:
+        new_rest_coefs.append(i)
+
+    return new_var_num, new_non_neg_rest_num, new_non_pos_rest_num, new_eq_rest_num, new_positive_indexes, new_func_coefs, new_rest_coefs, new_rest_b
 
 
 if __name__ == "__main__":
-    # positive = [0,1,2,4]
-    # bigger = [[2,9,1,0,3]]
-    # less = [[-3,-1,-4,-2,-10]]
-    # equal = [[3,2,0,8,6],
-    #          [9,3,0,8,2],
-    #          [8,1,1,0,8]]
-    # b = [1,-9,6,7,6]
-    # c = [3,-4,2,1,4]
+    var_num = 6
+    non_neg_rest_num = 3
+    non_pos_rest_num = 0
+    eq_rest_num = 3
 
-    positive = [0, 1, 2]
-    c = [3, -4, 2, 1, 4, 3]
-    bigger = [[2, 9, 1, 0, 3, 0],
-              [4, -1, -2, -3, 10, 1]]
-    less = [[-3, -1, -4, -2, -10, 3]
-            ]
-    equal = [[3, 2, 0, 8, 6, 0],
-             [9, 3, 0, 8, 2, 2],
-             [8, 1, 1, 0, 8, 0]]
-    b = [1, -9, 2, 6, 7, 6]
+    positive_indexes = [0, 1, 2]
+    func_coefs = [3, -4, 2, 1, 4, 3]
+    rest_coefs = [
+        [2, 9, 1, 0, 3, 0],
+        [4, -1, -2, -3, 10, 1],
+        [3, 1, 4, 2, 10, -3],
+        [3, 2, 0, 8, 6, 0],
+        [9, 3, 0, 8, 2, 2],
+        [8, 1, 1, 0, 8, 0]
+    ]
+    rest_b = [1, -9, -2, 6, 7, 6]
 
-    new_A, transform, new_b, new_c = converse_to_canonical(positive, c, bigger, less, equal, b)
-
-    print_canon_task_human_readable(new_A, new_c, new_b)
-
-    f = open('EnumMethod.txt', 'a')
-
-    x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform)
+print(convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, positive_indexes, func_coefs, rest_coefs,
+                    rest_b))
