@@ -167,6 +167,8 @@ def EnumMethod(A, b, c, M, N, transform, max=False):
         for i in range(len(c)):
             c[i] *= mult
 
+    f = open('EnumMethod.txt', 'w')
+
     vectors = find_all_vectors(A, b, M, N)
     if len(vectors) == 0:
         return []
@@ -177,17 +179,22 @@ def EnumMethod(A, b, c, M, N, transform, max=False):
     min_i = 1
     for tmp in vectors:
         current_val = np.dot(tmp, c)
-        print("step " + str(i) + ":")
+        f.write("step " + str(i) + ":\n")
+        f.writelines(map(lambda x: str(x) + ' ', np.dot(transform, np.matrix(tmp).transpose()).transpose().tolist()[0]))
+        f.write("\nf(X_" + str(i) + ") =" + str(current_val) + '\n')
         if current_val < min:
             min = current_val
             best_vector = tmp
             min_i = i
-        print(np.dot(transform, np.matrix(tmp).transpose() * mult).transpose().tolist(), '\n', "f(X_" + str(i) + ") =",
-              current_val * mult, '\n')
         i += 1
+    f.write("\nbest vector on step " + str(min_i) + ":\n")
+    f.writelines(map(lambda x: str(x) + ' ', np.dot(transform, np.matrix(best_vector).transpose()).transpose().tolist()[0]))
 
-    print("best vector on step " + str(min_i) + ":\n",
-          np.dot(transform, np.matrix(best_vector).transpose() * mult).transpose().tolist())
+    f.write("\n\nsolution:")
+    f.writelines(map(lambda y: str(y) + ' ', np.dot(transform, best_vector)))
+    f.write("\nf(X) = " + str(np.dot(c, best_vector)))
+
+    f.close()
 
     return (np.array(best_vector) * mult).tolist()
 
@@ -269,53 +276,23 @@ if __name__ == "__main__":
     # b = [1,-9,6,7,6]
     # c = [3,-4,2,1,4]
 
-    # positive = [0, 1, 2]
-    # c = [1, -9, -2, 6, 7, 6]
-    # bigger = []
-    # less = [
-    #     [2, 4, 3, 3, 9, 8],
-    #     [9, -1, 1, 2, 3, 1],
-    #     [1, -2, 4, 0, 0, 1]
-    # ]
-    # equal = [[0, -3, 2, 8, 8, 0],
-    #          [3, 10, 10, 6, 2, 8],
-    #          [0, 1, -3, 0, 2, 0]]
-    # b = [3, -4, 2, 1, 4, 3]
+    positive = [0, 1, 2]
+    c = [3, -4, 2, 1, 4, 3]
+    bigger = [[2, 9, 1, 0, 3, 0],
+              [4, -1, -2, -3, 10, 1]]
+    less = [[-3, -1, -4, -2, -10, 3]
+            ]
+    equal = [[3, 2, 0, 8, 6, 0],
+             [9, 3, 0, 8, 2, 2],
+             [8, 1, 1, 0, 8, 0]]
+    b = [1, -9, 2, 6, 7, 6]
 
-    # new_A, transform, new_b, new_c = converse_to_canonical(positive, c, bigger, less, equal, b)
-    # convertToDual(positive, c, bigger, less, equal, b)
+    new_A, transform, new_b, new_c = converse_to_canonical(positive, c, bigger, less, equal, b)
 
-    # print_canon_task_human_readable(new_A, new_c, new_b)
+    print_canon_task_human_readable(new_A, new_c, new_b)
 
-    # x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform, True)
-    # print("\nsolution:", np.dot(transform, x))
-    # print("f(X) = ", np.dot(new_c, x))
-    positive_indexes = [0, 1, 2]
-    func_coefs = [3, -4, 2, 1, 4, 3]
-    non_neg_coefs = [[2, 9, 1, 0, 3, 0],
-                     [4, -1, -2, -3, 10, 1],
-                     [3, 1, 4, 2, 10, -3]]
-    non_pos_coefs = [
+    f = open('EnumMethod.txt', 'a')
 
-    ]
-    eq_coefs = [[3, 2, 0, 8, 6, 0],
-                [9, 3, 0, 8, 2, 2],
-                [8, 1, 1, 0, 8, 0]]
-    rest_b = [1, -9, -2, 6, 7, 6]
+    x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform)
 
-    positive_indexes, func_coefs, non_pos_coefs, non_neg_coefs, eq_coefs, rest_b = convertToDual(positive_indexes,
-                                                                                                 func_coefs,
-                                                                                                 non_neg_coefs,
-                                                                                                 non_pos_coefs,
-                                                                                                 eq_coefs, rest_b)
-    print("positive_indexes", positive_indexes)
-    print("func_coefs", func_coefs)
-    print("non_neg_coefs", non_neg_coefs)
-    print("non_pos_coefs", non_pos_coefs)
-    print("eq_coefs", eq_coefs)
-    print("rest_b", rest_b)
 
-    new_A, transform, new_b, new_c = converse_to_canonical(positive_indexes, func_coefs, non_neg_coefs, non_pos_coefs,
-                                                           eq_coefs, rest_b)
-
-    x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform, True)
