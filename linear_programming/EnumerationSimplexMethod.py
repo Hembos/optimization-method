@@ -253,25 +253,3 @@ def convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, posi
         new_rest_coefs.append(i)
 
     return new_var_num, new_non_neg_rest_num, new_non_pos_rest_num, new_eq_rest_num, new_positive_indexes, new_func_coefs, new_rest_coefs, new_rest_b
-
-
-if __name__ == "__main__":
-    var_num = 6
-    non_neg_rest_num = 3
-    non_pos_rest_num = 0
-    eq_rest_num = 3
-
-    positive_indexes = [0, 1, 2]
-    func_coefs = [3, -4, 2, 1, 4, 3]
-    rest_coefs = [
-        [2, 9, 1, 0, 3, 0],
-        [4, -1, -2, -3, 10, 1],
-        [3, 1, 4, 2, 10, -3],
-        [3, 2, 0, 8, 6, 0],
-        [9, 3, 0, 8, 2, 2],
-        [8, 1, 1, 0, 8, 0]
-    ]
-    rest_b = [1, -9, -2, 6, 7, 6]
-
-print(convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, positive_indexes, func_coefs, rest_coefs,
-                    rest_b))

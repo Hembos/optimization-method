@@ -4,7 +4,7 @@ import PySimpleGUI as sg
 from TaskConversion import conversion_to_standart
 import TableSymplexMethod
 from EnumerationSimplexMethod import converse_to_canonical
-from EnumerationSimplexMethod import EnumMethod
+from EnumerationSimplexMethod import EnumMethod, convertToDual
 
 
 class Interface:
@@ -24,6 +24,7 @@ class Interface:
         self.__rest_b = None
 
         self.__main_window = self.__create_main_window()
+        self.__solution_window = None
 
     def __create_main_window(self):
         layout = [
@@ -84,22 +85,22 @@ class Interface:
             sg.popup_error(f'AN EXCEPTION OCCURRED!', e, tb)
 
     def create_default_task(self):
-        # self.__var_num = 6
-        # self.__non_neg_rest_num = 0
-        # self.__non_pos_rest_num = 3
-        # self.__eq_rest_num = 3
-        #
-        # self.__positive_indexes = [0, 1, 2]
-        # self.__func_coefs = [1, -9, -2, 6, 7, 6]
-        # self.__rest_coefs = [
-        #     [2,  4,  3, 3, 9, 8],
-        #     [9, -1,  1, 2, 3, 1],
-        #     [1, -2,  4, 0, 0, 1],
-        #     [0, -3,  2, 8, 8, 0],
-        #     [3, 10, 10, 6, 2, 8],
-        #     [0,  1, -3, 0, 2, 0]
-        # ]
-        # self.__rest_b = [3, -4, 2, 1, 4, 3]
+        self.__var_num = 6
+        self.__non_neg_rest_num = 0
+        self.__non_pos_rest_num = 3
+        self.__eq_rest_num = 3
+
+        self.__positive_indexes = [0, 1, 2]
+        self.__func_coefs = [1, -9, -2, 6, 7, 6]
+        self.__rest_coefs = [
+            [2, 4, 3, 3, 9, 8],
+            [9, -1, 1, 2, 3, 1],
+            [1, -2, 4, 0, 0, 1],
+            [0, -3, 2, 8, 8, 0],
+            [3, 10, 10, 6, 2, 8],
+            [0, 1, -3, 0, 2, 0]
+        ]
+        self.__rest_b = [3, -4, 2, 1, 4, 3]
 
         # self.__var_num = 6
         # self.__non_neg_rest_num = 3
@@ -144,53 +145,150 @@ class Interface:
         # ]
         # self.__rest_b = [3, 1, 2]
 
-        self.__var_num = 5
-        self.__non_neg_rest_num = 1
-        self.__non_pos_rest_num = 1
-        self.__eq_rest_num = 3
+        # self.__var_num = 5
+        # self.__non_neg_rest_num = 1
+        # self.__non_pos_rest_num = 1
+        # self.__eq_rest_num = 3
+        #
+        # self.__positive_indexes = [0, 1, 2, 4]
+        # self.__func_coefs = [3, -4, 2, 1, 4]
+        # self.__rest_coefs = [
+        #     [2, 9, 1, 0, 3],
+        #     [-3, -1, -4, -2, -10],
+        #     [3, 2, 0, 8, 6],
+        #     [9, 3, 0, 8, 2],
+        #     [8, 1, 1, 0, 8]
+        # ]
+        # self.__rest_b = [1, -9, 6, 7, 6]
 
-        self.__positive_indexes = [0, 1, 2, 4]
-        self.__func_coefs = [3, -4, 2, 1, 4]
-        self.__rest_coefs = [
-            [2, 9, 1, 0, 3],
-            [-3, -1, -4, -2, -10],
-            [3, 2, 0, 8, 6],
-            [9, 3, 0, 8, 2],
-            [8, 1, 1, 0, 8]
-        ]
-        self.__rest_b = [1, -9, 6, 7, 6]
+    def task_to_str(self, var_num, func_coefs, non_neg_rest_num, non_pos_rest_num, eq_rest_num, rest_coefs, rest_b):
+        task = "f(x) = "
+        for j in range(var_num):
+            task += f'{func_coefs[j]}*x{j}'
+            if j != var_num - 1:
+                task += ' + '
+        task += '\n'
+        for i in range(non_neg_rest_num + non_pos_rest_num + eq_rest_num):
+            for j in range(var_num):
+                task += str(rest_coefs[i][j])
+                task += f'*x{j}'
+                if j != var_num - 1:
+                    task += ' + '
+            if i < non_neg_rest_num:
+                task += ' >= '
+            elif i < non_neg_rest_num + non_pos_rest_num:
+                task += ' <= '
+            else:
+                task += ' = '
+            task += str(rest_b[i])
+            task += '\n'
 
-    def solve(self):
-        self.A, self.b, self.c = conversion_to_standart(self.__var_num, self.__positive_indexes,
-                                                        self.__non_neg_rest_num, self.__non_pos_rest_num,
-                                                        self.__eq_rest_num, self.__func_coefs,
-                                                        self.__rest_b, self.__rest_coefs)
+        return task
+
+    def get_simplex_solution(self, var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num,
+                             positive_indexes, func_coefs, rest_coefs, rest_b, its_min):
+        A, b, c = conversion_to_standart(var_num, positive_indexes,
+                                         non_neg_rest_num, non_pos_rest_num,
+                                         eq_rest_num, func_coefs,
+                                         rest_b, rest_coefs)
         """Здесь решается симплекс методом"""
-        solution = TableSymplexMethod.get_optimal_solution(self.A, self.b, [-x for x in self.c])
-        solution_value = sum(x * y for (x, y) in zip(solution, self.c))
+        solution = TableSymplexMethod.get_optimal_solution(A, b, [-x*its_min for x in c])
+        solution_value = sum(x * y for (x, y) in zip(solution, c))
 
-        j = self.__var_num
-        for i in list(filter(lambda x: x not in self.__positive_indexes, range(self.__var_num))):
+        j = var_num
+        for i in list(filter(lambda x: x not in positive_indexes, range(var_num))):
             solution[i] -= solution[j]
             j += 1
 
-        solution = solution[:self.__var_num]
+        solution = solution[:var_num]
 
-        print(solution)
-        print(solution_value)
+        return solution, solution_value
 
-        ##################################
-        """Здесь решается переборным методом"""
+    def get_enum_solution(self, var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num,
+                          positive_indexes, func_coefs, rest_coefs, rest_b, its_min):
+        new_A, transform, new_b, new_c = converse_to_canonical(var_num, non_neg_rest_num,
+                                                               non_pos_rest_num, eq_rest_num,
+                                                               positive_indexes, func_coefs,
+                                                               rest_coefs, rest_b)
 
-        new_A, transform, new_b, new_c = converse_to_canonical(self.__var_num, self.__non_neg_rest_num,
+        solution = EnumMethod(new_A, new_b, [x*its_min for x in new_c], new_A.shape[0], new_A.shape[1], transform)
+        solution_value = sum(x * y for (x, y) in zip(solution[0], func_coefs))
+
+        return solution, solution_value
+
+    def solve(self):
+        dual_var_num, dual_non_neg_rest_num, dual_non_pos_rest_num, dual_eq_rest_num, \
+        dual_positive_indexes, dual_func_coefs, dual_rest_coefs, dual_rest_b = \
+            convertToDual(self.__var_num, self.__non_neg_rest_num, self.__non_pos_rest_num, self.__eq_rest_num,
+                          self.__positive_indexes, self.__func_coefs, self.__rest_coefs, self.__rest_b)
+
+        solution1, solution_value1 = self.get_simplex_solution(self.__var_num, self.__non_neg_rest_num,
                                                                self.__non_pos_rest_num, self.__eq_rest_num,
                                                                self.__positive_indexes, self.__func_coefs,
-                                                               self.__rest_coefs, self.__rest_b)
+                                                               self.__rest_coefs, self.__rest_b, -1)
+        solution2, solution_value2 = self.get_enum_solution(self.__var_num, self.__non_neg_rest_num,
+                                                            self.__non_pos_rest_num, self.__eq_rest_num,
+                                                            self.__positive_indexes, self.__func_coefs,
+                                                            self.__rest_coefs, self.__rest_b, -1)
 
-        x = EnumMethod(new_A, new_b, new_c, new_A.shape[0], new_A.shape[1], transform)
+        dual_solution1, dual_solution_value1 = self.get_simplex_solution(dual_var_num, dual_non_neg_rest_num,
+                                                               dual_non_pos_rest_num, dual_eq_rest_num,
+                                                               dual_positive_indexes, dual_func_coefs,
+                                                               dual_rest_coefs, dual_rest_b, 1)
+        dual_solution2, dual_solution_value2 = self.get_enum_solution(dual_var_num, dual_non_neg_rest_num,
+                                                               dual_non_pos_rest_num, dual_eq_rest_num,
+                                                               dual_positive_indexes, dual_func_coefs,
+                                                               dual_rest_coefs, dual_rest_b, 1)
 
-        print(x)
-        ##################################
+        layout = [
+            [
+              sg.Text("Прямая задача")
+            ],
+            [
+                sg.Text(self.task_to_str(self.__var_num, self.__func_coefs, self.__non_neg_rest_num,
+                                         self.__non_pos_rest_num, self.__eq_rest_num, self.__rest_coefs,
+                                         self.__rest_b))
+            ],
+            [
+                sg.Text("Симплекс метод"),
+                sg.Text(solution1)
+            ],
+            [
+                sg.Text(solution_value1)
+            ],
+            [
+                sg.Text("Переборный метод"),
+                sg.Text(solution2[0])
+            ],
+            [
+                sg.Text(solution_value2)
+            ]
+        ]
+        layout_dual = [
+            [
+                sg.Text("Двойственная задача")
+            ],
+            [
+                sg.Text(self.task_to_str(dual_var_num, dual_func_coefs, dual_non_neg_rest_num, dual_non_pos_rest_num,
+                                         dual_eq_rest_num, dual_rest_coefs, dual_rest_b))
+            ],
+            [
+                sg.Text("Симплекс метод"),
+                sg.Text(dual_solution1)
+            ],
+            [
+                sg.Text(dual_solution_value1)
+            ],
+            [
+                sg.Text("Переборный метод"),
+                sg.Text(dual_solution2[0])
+            ],
+            [
+                sg.Text(dual_solution_value2)
+            ]
+        ]
+        layout.append(layout_dual)
+        self.__solution_window = sg.Window("Simplex method", layout, finalize=True)
 
     def main_loop(self):
         while True:
