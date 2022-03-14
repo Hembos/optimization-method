@@ -245,7 +245,7 @@ class Interface:
               sg.Text("Прямая задача")
             ],
             [
-                sg.Text(self.task_to_str(self.__var_num, self.__func_coefs, self.__non_neg_rest_num,
+                sg.Text(self.task_to_str( self.__var_num, self.__func_coefs, self.__non_neg_rest_num,
                                          self.__non_pos_rest_num, self.__eq_rest_num, self.__rest_coefs,
                                          self.__rest_b))
             ],
