@@ -1,0 +1,2 @@
+class CreateTaskException(Exception):
+    pass

@@ -8,14 +8,14 @@ def get_solution(transport_task, storage_points, destinations, rows_num, cols_nu
     potential_storage, potential_destinations = get_potentials(
             transport_task=transport_task, approach=approach, rows_num=rows_num, cols_num=cols_num)
     is_optimal, point = is_it_optimal_plan(
-        potential_storage, potential_destinations, approach, rows_num, cols_num, transport)
+        potential_storage, potential_destinations, approach, rows_num, cols_num, transport_task)
 
     while is_optimal != True:
         calculate_next_approach(approach=approach, point=point)
         potential_storage, potential_destinations = get_potentials(
             transport_task=transport_task, approach=approach, rows_num=rows_num, cols_num=cols_num)
         is_optimal, point = is_it_optimal_plan(
-            potential_storage, potential_destinations, approach, rows_num, cols_num, transport)
+            potential_storage, potential_destinations, approach, rows_num, cols_num, transport_task)
         
     solution = sum(transport_task[key[0]][key[1]] * approach[key] for key in approach)
 
