@@ -23,7 +23,6 @@ def TransitionToClosedView(transport_cost: list[list], storage: list, destinatio
         destination_sum += i
 
     d = storage_sum - destination_sum
-    f = []
     return_code = 0
     if d < 0:
         new_storage.append(-d)
