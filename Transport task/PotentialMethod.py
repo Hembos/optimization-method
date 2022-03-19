@@ -1,21 +1,39 @@
 from NorthWestCornerMethod import get_first_approach
 import math
+import logging
 
 
 def get_solution(transport_task, storage_points, destinations, rows_num, cols_num):
+    logging.info("Решение задачи методом потенциалов")
     approach = get_first_approach(
         storage_points=storage_points, destinations=destinations)
     potential_storage, potential_destinations = get_potentials(
             transport_task=transport_task, approach=approach, rows_num=rows_num, cols_num=cols_num)
     is_optimal, point = is_it_optimal_plan(
         potential_storage, potential_destinations, approach, rows_num, cols_num, transport_task)
+    
+    approach_index = 0
 
     while is_optimal != True:
+        str_approach = f"Приближение {approach_index}:\n"
+        for i in range(rows_num):
+            for j in range(cols_num):
+                if (i, j) in approach:
+                    str_approach += str(approach[(i, j)]) + ' '
+                else:
+                    str_approach += "X "
+            str_approach += "\n"
+        logging.info(str_approach)
+        
         calculate_next_approach(approach=approach, point=point)
         potential_storage, potential_destinations = get_potentials(
             transport_task=transport_task, approach=approach, rows_num=rows_num, cols_num=cols_num)
         is_optimal, point = is_it_optimal_plan(
             potential_storage, potential_destinations, approach, rows_num, cols_num, transport_task)
+        
+        approach_index += 1
+        solution = sum(transport_task[key[0]][key[1]] * approach[key] for key in approach)
+        logging.info("Текущее значение стоимости:" + str(solution) + '\n')
         
     solution = sum(transport_task[key[0]][key[1]] * approach[key] for key in approach)
 

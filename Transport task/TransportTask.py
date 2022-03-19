@@ -50,7 +50,8 @@ class TransportTask:
     def create_task(self, values):
         try:
             self.storage = [float(x) for x in values["storage"].split(' ')]
-            self.destination = [float(x) for x in values["destination"].split(' ')]
+            self.destination = [float(x)
+                                for x in values["destination"].split(' ')]
             self.transport_cost = [[float(x) for x in y.split(
                 ' ')] for y in values["transport_task"].split('\n')]
             self.check_task()
@@ -68,14 +69,16 @@ class TransportTask:
         else:
             for row in self.transport_cost:
                 if cols_num != len(row):
-                    raise CreateTaskException("Не совпадает количество столбцов")
+                    raise CreateTaskException(
+                        "Не совпадает количество столбцов")
 
     def solve(self):
         rows_num = len(self.storage)
         cols_num = len(self.destination)
-        solution_value = get_solution(self.transport_cost, self.storage, self.destination, rows_num, cols_num)
+        solution_value = get_solution(
+            self.transport_cost, self.storage, self.destination, rows_num, cols_num)
         print(solution_value)
-        
+
     def main_loop(self):
         while True:
             event, values = self.main_window.read()
@@ -87,8 +90,3 @@ class TransportTask:
             elif event == "Решить":
                 self.create_task(values)
                 self.solve()
-
-
-if __name__ == "__main__":
-    transport_task = TransportTask()
-    transport_task.main_loop()
