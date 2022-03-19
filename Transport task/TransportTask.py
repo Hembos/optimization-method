@@ -1,6 +1,8 @@
 import PySimpleGUI as sg
 import traceback
 
+from numpy import matrix
+
 from PotentialMethod import get_solution
 
 from TaskException import CreateTaskException
@@ -15,6 +17,7 @@ class TransportTask:
         self.transport_cost = None
 
         self.main_window = self.create_main_window()
+        self.result_window = None
 
     def create_main_window(self):
         layout = [
@@ -38,6 +41,55 @@ class TransportTask:
         ]
 
         return sg.Window("Transport task", layout=layout, finalize=True)
+    
+    def create_result_window(self, closed_transport_cost, closed_storage, closed_destinations, solution, solution_value):
+        str_closed_transport_cost = ""
+        
+        for row in closed_transport_cost:
+            for col in row:
+                str_closed_transport_cost += f"{col}  "
+            str_closed_transport_cost += "\n"
+            
+        str_closed_storage = ""
+        for i in closed_storage:
+            str_closed_storage += f"{i}  "
+            
+        str_closed_destinations = ""
+        for i in closed_destinations:
+            str_closed_destinations += f"{i}  "
+        
+        str_solution = ""
+        for i in range(len(closed_storage)):
+            for j in range(len(closed_destinations)):
+                if (i, j) in solution:
+                    str_solution += str(solution[(i, j)]) + '  '
+                else:
+                    str_solution += "X  "
+            str_solution += "\n"
+            
+        layout = [
+            [
+                sg.Text("Матрица стоимостей"),
+                sg.Text(str_closed_transport_cost)
+            ],
+            [
+                sg.Text("Поставщики:"),
+                sg.Text(str_closed_storage)
+            ],
+            [
+                sg.Text("Потребители:"),
+                sg.Text(str_closed_destinations)
+            ],
+            [
+                sg.Text("Решение"),
+                sg.Text(str_solution)
+            ],
+            [
+                sg.Text(str(solution_value))
+            ]
+        ]
+        
+        return sg.Window("Transport task", layout, finalize=True)
 
     def create_default_task(self):
         self.storage = [16, 5, 15, 9]
@@ -80,9 +132,11 @@ class TransportTask:
 
         rows_num = len(closed_storage)
         cols_num = len(closed_destination)
-        solution_value = get_solution(
+        solution, solution_value = get_solution(
             closed_transport_cost, closed_storage, closed_destination, rows_num, cols_num)
         print(solution_value)
+        
+        self.result_window = self.create_result_window(closed_transport_cost, closed_storage, closed_destination, solution, solution_value)
 
     def main_loop(self):
         while True:

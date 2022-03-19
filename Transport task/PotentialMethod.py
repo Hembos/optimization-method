@@ -37,7 +37,7 @@ def get_solution(transport_task, storage_points, destinations, rows_num, cols_nu
         
     solution = sum(transport_task[key[0]][key[1]] * approach[key] for key in approach)
 
-    return solution
+    return approach, solution
 
 
 def is_it_optimal_plan(potential_storage, potential_destinations, approach, rows_num, cols_num, transport):
