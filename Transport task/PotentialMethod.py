@@ -4,7 +4,7 @@ import logging
 
 
 def get_solution(transport_task, storage_points, destinations, rows_num, cols_num):
-    logging.info("Решение задачи методом потенциалов")
+    logging.info("\nРешение задачи методом потенциалов")
     approach = get_first_approach(
         storage_points=storage_points, destinations=destinations)
     potential_storage, potential_destinations = get_potentials(

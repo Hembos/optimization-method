@@ -5,6 +5,8 @@ from PotentialMethod import get_solution
 
 from TaskException import CreateTaskException
 
+from TransitionToClosedView import TransitionToClosedView
+
 
 class TransportTask:
     def __init__(self):
@@ -38,7 +40,7 @@ class TransportTask:
         return sg.Window("Transport task", layout=layout, finalize=True)
 
     def create_default_task(self):
-        self.storage = [19, 5, 21, 9]
+        self.storage = [16, 5, 15, 9]
         self.destination = [12, 12, 11, 8, 11]
         self.transport_cost = [
             [3, 2, 7, 11, 11],
@@ -73,10 +75,13 @@ class TransportTask:
                         "Не совпадает количество столбцов")
 
     def solve(self):
-        rows_num = len(self.storage)
-        cols_num = len(self.destination)
+        closed_transport_cost, closed_storage, closed_destination, return_code = TransitionToClosedView(
+            self.transport_cost, self.storage, self.destination)
+
+        rows_num = len(closed_storage)
+        cols_num = len(closed_destination)
         solution_value = get_solution(
-            self.transport_cost, self.storage, self.destination, rows_num, cols_num)
+            closed_transport_cost, closed_storage, closed_destination, rows_num, cols_num)
         print(solution_value)
 
     def main_loop(self):
