@@ -7,7 +7,7 @@ def quick_check_zero_det(matrix: np.ndarray):
     zero_line = True
     for i in range(matrix.shape[1]):
         for j in range(matrix.shape[0]):
-            if matrix.item(i,j) != 0:
+            if matrix.item(i, j) != 0:
                 zero_line = False
                 break
         if zero_line:
@@ -142,7 +142,30 @@ def enum_method(A, b, c, M, N, max=False):
 
     f.close()
 
-    return (np.array(best_vector) * mult).tolist()
+    return (np.array(best_vector) * mult).tolist(), min
+
+
+def solve_enum(storage: list, destination: list, transport_cost: list[list]):
+    """
+            функция для решения транспортной задачи перебором опорных точек
+            :param transport_cost: матрица стоимостей перемещений
+            :param storage: вектор с количеством хранящегося на складах товара
+            :param destination: вектор с количеством необходимого в точках выгрузки товара
+            :return result_matrix: матрица оптимальных перевозок
+            :return best_value: сумма стоимостей оптимальных перевозок
+            :return return_code: 0 - данные не изменились, 1 - добавлен фиктивный покупатель, 2 - добавлен фиктивный поставщик
+        """
+    new_transport_cost, new_storage, new_destination, return_code = TransitionToClosedView(transport_cost, storage,
+                                                                                           destination)
+    A, b, c = make_simplex_task(new_transport_cost, new_storage, new_destination)
+
+    # без удаления последней строки не работает
+    A.pop(len(A) - 1)
+    b.pop(len(b) - 1)
+    x, best_value = enum_method(A, b, c, len(A), len(A[0]))
+    result_matrix = np.reshape(x, (len(new_transport_cost), len(new_transport_cost[0]))).tolist()
+
+    return result_matrix, best_value, return_code
 
 
 if __name__ == '__main__':
@@ -154,21 +177,4 @@ if __name__ == '__main__':
         [9, 4, 7, 15, 11],
         [2, 5, 1, 5, 3]
     ]
-
-    # print(MakeSimplexTask(transport_costl, storagel, destinationl))
-
-    new_transport_cost, new_storage, new_destination, v = TransitionToClosedView(transport_costl, storagel,
-                                                                                 destinationl)
-
-    print(np.matrix(new_transport_cost))
-
-    A, b, c = make_simplex_task(new_transport_cost, new_storage, new_destination)
-
-    print(np.hstack((np.matrix(A), np.matrix(b).transpose())))
-
-    # без удаления последней строки не работает
-    A.pop(len(A) - 1)
-    b.pop(len(b) - 1)
-
-    x = enum_method(A, b, c, len(A), len(A[0]))
-    print(x)
+    print(solve_enum(storagel, destinationl, transport_costl))
