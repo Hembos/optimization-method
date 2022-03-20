@@ -151,8 +151,6 @@ class TransportTask:
         enum_solution, enum_solution_value = solve_enum(
             closed_transport_cost, closed_storage, closed_destination)
         
-        print(enum_solution)
-
         self.result_window = self.create_result_window(
             closed_transport_cost, closed_storage, closed_destination, potential_solution, potential_solution_value, enum_solution, enum_solution_value)
 
