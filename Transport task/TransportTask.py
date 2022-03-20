@@ -1,13 +1,13 @@
 import PySimpleGUI as sg
 import traceback
 
-from numpy import matrix
-
 from PotentialMethod import get_solution
 
 from TaskException import CreateTaskException
 
 from TransitionToClosedView import TransitionToClosedView
+
+from EnumerationMethod import solve_enum
 
 
 class TransportTask:
@@ -41,32 +41,42 @@ class TransportTask:
         ]
 
         return sg.Window("Transport task", layout=layout, finalize=True)
-    
-    def create_result_window(self, closed_transport_cost, closed_storage, closed_destinations, solution, solution_value):
+
+    def create_result_window(self, closed_transport_cost, closed_storage, closed_destinations, potential_solution, potential_solution_value, enum_solution, enum_solution_value):
         str_closed_transport_cost = ""
-        
+
         for row in closed_transport_cost:
             for col in row:
                 str_closed_transport_cost += f"{col}  "
             str_closed_transport_cost += "\n"
-            
+
         str_closed_storage = ""
         for i in closed_storage:
             str_closed_storage += f"{i}  "
-            
+
         str_closed_destinations = ""
         for i in closed_destinations:
             str_closed_destinations += f"{i}  "
-        
-        str_solution = ""
+
+        str_potential_solution = ""
         for i in range(len(closed_storage)):
             for j in range(len(closed_destinations)):
-                if (i, j) in solution:
-                    str_solution += str(solution[(i, j)]) + '  '
+                if (i, j) in potential_solution:
+                    str_potential_solution += str(potential_solution[(i, j)]) + '  '
                 else:
-                    str_solution += "X  "
-            str_solution += "\n"
+                    str_potential_solution += "X  "
+            str_potential_solution += "\n"
             
+        str_enum_solution = ""
+        for i in range(len(closed_storage)):
+            for j in range(len(closed_destinations)):
+                if enum_solution[i][j] != 0.0:
+                    str_enum_solution += str(enum_solution[i][j]) + '  '
+                else:
+                    str_enum_solution += "X  "
+            str_enum_solution += "\n"
+            
+
         layout = [
             [
                 sg.Text("Матрица стоимостей"),
@@ -81,19 +91,22 @@ class TransportTask:
                 sg.Text(str_closed_destinations)
             ],
             [
-                sg.Text("Решение"),
-                sg.Text(str_solution)
+                sg.Text("Решение методом потенциалов"),
+                sg.Text(str_potential_solution),
+                sg.Text(str(potential_solution_value))
             ],
             [
-                sg.Text(str(solution_value))
+                sg.Text("Решение переборным методом"),
+                sg.Text(str_enum_solution),
+                sg.Text(str(enum_solution_value))
             ]
         ]
-        
+
         return sg.Window("Transport task", layout, finalize=True)
 
     def create_default_task(self):
-        self.storage = [16, 5, 15, 9]
-        self.destination = [12, 12, 11, 8, 11]
+        self.storage = [19, 5, 21, 9]
+        self.destination = [12, 9, 11, 8, 6]
         self.transport_cost = [
             [3, 2, 7, 11, 11],
             [2, 4, 5, 14, 8],
@@ -132,11 +145,16 @@ class TransportTask:
 
         rows_num = len(closed_storage)
         cols_num = len(closed_destination)
-        solution, solution_value = get_solution(
+        potential_solution, potential_solution_value = get_solution(
             closed_transport_cost, closed_storage, closed_destination, rows_num, cols_num)
-        print(solution_value)
+
+        enum_solution, enum_solution_value = solve_enum(
+            closed_transport_cost, closed_storage, closed_destination)
         
-        self.result_window = self.create_result_window(closed_transport_cost, closed_storage, closed_destination, solution, solution_value)
+        print(enum_solution)
+
+        self.result_window = self.create_result_window(
+            closed_transport_cost, closed_storage, closed_destination, potential_solution, potential_solution_value, enum_solution, enum_solution_value)
 
     def main_loop(self):
         while True:

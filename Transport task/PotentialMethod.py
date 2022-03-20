@@ -118,7 +118,7 @@ def calculate_next_approach(approach, point):
 
     minus_elements = []
     plus_elements = []
-    cur_array = minus_elements
+    cur_array = plus_elements
     shift = math.inf
     new_empty_node = None
     for x in cycle:

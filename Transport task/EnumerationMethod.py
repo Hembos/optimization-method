@@ -153,19 +153,16 @@ def solve_enum(transport_cost: list[list], storage: list, destination: list):
             :param destination: вектор с количеством необходимого в точках выгрузки товара
             :return result_matrix: матрица оптимальных перевозок
             :return best_value: сумма стоимостей оптимальных перевозок
-            :return return_code: 0 - данные не изменились, 1 - добавлен фиктивный покупатель, 2 - добавлен фиктивный поставщик
         """
-    new_transport_cost, new_storage, new_destination, return_code = TransitionToClosedView(transport_cost, storage,
-                                                                                           destination)
-    A, b, c = make_simplex_task(new_transport_cost, new_storage, new_destination)
+    A, b, c = make_simplex_task(transport_cost, storage, destination)
 
     # без удаления последней строки не работает
     A.pop(len(A) - 1)
     b.pop(len(b) - 1)
     x, best_value = enum_method(A, b, c, len(A), len(A[0]))
-    result_matrix = np.reshape(x, (len(new_transport_cost), len(new_transport_cost[0]))).tolist()
+    result_matrix = np.reshape(x, (len(transport_cost), len(transport_cost[0]))).tolist()
 
-    return result_matrix, best_value, return_code
+    return result_matrix, best_value
 
 
 if __name__ == '__main__':
