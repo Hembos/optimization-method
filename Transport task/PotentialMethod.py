@@ -34,8 +34,19 @@ def get_solution(transport_task, storage_points, destinations, rows_num, cols_nu
         approach_index += 1
         solution = sum(transport_task[key[0]][key[1]] * approach[key] for key in approach)
         logging.info("Текущее значение стоимости:" + str(solution) + '\n')
+
+    str_approach = f"Приближение {approach_index}:\n"
+    for i in range(rows_num):
+        for j in range(cols_num):
+            if (i, j) in approach:
+                str_approach += str(approach[(i, j)]) + ' '
+            else:
+                str_approach += "X "
+        str_approach += "\n"
+    logging.info(str_approach)
         
     solution = sum(transport_task[key[0]][key[1]] * approach[key] for key in approach)
+    logging.info("Текущее значение стоимости:" + str(solution) + '\n')
 
     return approach, solution
 
