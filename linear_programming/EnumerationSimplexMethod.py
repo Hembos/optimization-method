@@ -1,5 +1,6 @@
 from itertools import combinations
 import numpy as np
+import copy
 
 
 def converse_to_canonical(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, positive_indexes, func_coefs,
@@ -12,7 +13,7 @@ def converse_to_canonical(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_n
     #############################
 
     start_vars_count = var_num
-    new_rest_coefs = rest_coefs.copy()
+    new_rest_coefs = copy.deepcopy(rest_coefs)
     new_rest_b = rest_b.copy()
     new_func_coefs = func_coefs.copy()
 
@@ -228,7 +229,7 @@ def convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, posi
     for i in range(non_neg_rest_num + non_pos_rest_num):
         new_positive_indexes.append(i)
         if i >= non_neg_rest_num:
-            row = (np.array(-rest_coefs[i])).tolist()
+            row = (-np.array(rest_coefs[i])).tolist()
         else:
             row = (np.array(rest_coefs[i])).tolist()
         A.append(row)

@@ -104,8 +104,8 @@ class Interface:
         # self.__rest_b = [3, -4, 2, 1, 4, 3]
 
         self.__var_num = 6
-        self.__non_neg_rest_num = 3
-        self.__non_pos_rest_num = 0
+        self.__non_neg_rest_num = 2
+        self.__non_pos_rest_num = 1
         self.__eq_rest_num = 3
         
         self.__positive_indexes = [0, 1, 2]
@@ -113,12 +113,12 @@ class Interface:
         self.__rest_coefs = [
             [2, 9, 1, 0, 3, 0],
             [4, -1, -2, -3, 10, 1],
-            [3, 1, 4, 2, 10, -3],
+            [-3, -1, -4, -2, -10, 3],
             [3, 2, 0, 8, 6, 0],
             [9, 3, 0, 8, 2, 2],
             [8, 1, 1, 0, 8, 0]
         ]
-        self.__rest_b = [1, -9, -2, 6, 7, 6]
+        self.__rest_b = [1, -9, 2, 6, 7, 6]
 
         # self.__var_num = 3
         # self.__non_neg_rest_num = 0
