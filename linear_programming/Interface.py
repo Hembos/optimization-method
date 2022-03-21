@@ -1,3 +1,4 @@
+import logging
 import traceback
 
 import PySimpleGUI as sg
@@ -85,39 +86,39 @@ class Interface:
             sg.popup_error(f'AN EXCEPTION OCCURRED!', e, tb)
 
     def create_default_task(self):
-        self.__var_num = 6
-        self.__non_neg_rest_num = 0
-        self.__non_pos_rest_num = 3
-        self.__eq_rest_num = 3
-
-        self.__positive_indexes = [0, 1, 2]
-        self.__func_coefs = [1, -9, -2, 6, 7, 6]
-        self.__rest_coefs = [
-            [2, 4, 3, 3, 9, 8],
-            [9, -1, 1, 2, 3, 1],
-            [1, -2, 4, 0, 0, 1],
-            [0, -3, 2, 8, 8, 0],
-            [3, 10, 10, 6, 2, 8],
-            [0, 1, -3, 0, 2, 0]
-        ]
-        self.__rest_b = [3, -4, 2, 1, 4, 3]
-
         # self.__var_num = 6
-        # self.__non_neg_rest_num = 3
-        # self.__non_pos_rest_num = 0
+        # self.__non_neg_rest_num = 0
+        # self.__non_pos_rest_num = 3
         # self.__eq_rest_num = 3
-        #
+
         # self.__positive_indexes = [0, 1, 2]
-        # self.__func_coefs = [3, -4, 2, 1, 4, 3]
+        # self.__func_coefs = [1, -9, -2, 6, 7, 6]
         # self.__rest_coefs = [
-        #     [2, 9, 1, 0, 3, 0],
-        #     [4, -1, -2, -3, 10, 1],
-        #     [3, 1, 4, 2, 10, -3],
-        #     [3, 2, 0, 8, 6, 0],
-        #     [9, 3, 0, 8, 2, 2],
-        #     [8, 1, 1, 0, 8, 0]
+        #     [2, 4, 3, 3, 9, 8],
+        #     [9, -1, 1, 2, 3, 1],
+        #     [1, -2, 4, 0, 0, 1],
+        #     [0, -3, 2, 8, 8, 0],
+        #     [3, 10, 10, 6, 2, 8],
+        #     [0, 1, -3, 0, 2, 0]
         # ]
-        # self.__rest_b = [1, -9, -2, 6, 7, 6]
+        # self.__rest_b = [3, -4, 2, 1, 4, 3]
+
+        self.__var_num = 6
+        self.__non_neg_rest_num = 3
+        self.__non_pos_rest_num = 0
+        self.__eq_rest_num = 3
+        
+        self.__positive_indexes = [0, 1, 2]
+        self.__func_coefs = [3, -4, 2, 1, 4, 3]
+        self.__rest_coefs = [
+            [2, 9, 1, 0, 3, 0],
+            [4, -1, -2, -3, 10, 1],
+            [3, 1, 4, 2, 10, -3],
+            [3, 2, 0, 8, 6, 0],
+            [9, 3, 0, 8, 2, 2],
+            [8, 1, 1, 0, 8, 0]
+        ]
+        self.__rest_b = [1, -9, -2, 6, 7, 6]
 
         # self.__var_num = 3
         # self.__non_neg_rest_num = 0
@@ -192,7 +193,7 @@ class Interface:
                                          eq_rest_num, func_coefs,
                                          rest_b, rest_coefs)
         """Здесь решается симплекс методом"""
-        solution = TableSymplexMethod.get_optimal_solution(A, b, [-x*its_min for x in c])
+        solution = TableSymplexMethod.get_optimal_solution(A, b, [-x*its_min for x in c], positive_indexes, var_num, c)
         solution_value = sum(x * y for (x, y) in zip(solution, c))
 
         j = var_num
@@ -222,23 +223,24 @@ class Interface:
             convertToDual(self.__var_num, self.__non_neg_rest_num, self.__non_pos_rest_num, self.__eq_rest_num,
                           self.__positive_indexes, self.__func_coefs, self.__rest_coefs, self.__rest_b)
 
+        logging.info("Прямая задача")
         solution1, solution_value1 = self.get_simplex_solution(self.__var_num, self.__non_neg_rest_num,
                                                                self.__non_pos_rest_num, self.__eq_rest_num,
                                                                self.__positive_indexes, self.__func_coefs,
-                                                               self.__rest_coefs, self.__rest_b, -1)
+                                                               self.__rest_coefs, self.__rest_b, 1)
         solution2, solution_value2 = self.get_enum_solution(self.__var_num, self.__non_neg_rest_num,
                                                             self.__non_pos_rest_num, self.__eq_rest_num,
                                                             self.__positive_indexes, self.__func_coefs,
-                                                            self.__rest_coefs, self.__rest_b, -1)
-
+                                                            self.__rest_coefs, self.__rest_b, 1)
+        logging.info("Двойственная задача")
         dual_solution1, dual_solution_value1 = self.get_simplex_solution(dual_var_num, dual_non_neg_rest_num,
                                                                dual_non_pos_rest_num, dual_eq_rest_num,
                                                                dual_positive_indexes, dual_func_coefs,
-                                                               dual_rest_coefs, dual_rest_b, 1)
+                                                               dual_rest_coefs, dual_rest_b, -1)
         dual_solution2, dual_solution_value2 = self.get_enum_solution(dual_var_num, dual_non_neg_rest_num,
                                                                dual_non_pos_rest_num, dual_eq_rest_num,
                                                                dual_positive_indexes, dual_func_coefs,
-                                                               dual_rest_coefs, dual_rest_b, 1)
+                                                               dual_rest_coefs, dual_rest_b, -1)
 
         layout = [
             [

@@ -4,6 +4,7 @@ import numpy as np
 
 import bisect
 
+import logging
 
 def initialize_simplex(A, b, c, var_num, rest_num):
     """
@@ -153,7 +154,7 @@ def pivot(N, B, A, b, c, v, l, e):
     return N_new, B_new, A_new, b_new, c_new, v_new
 
 
-def simplex(A, b, c, var_num, rest_num):
+def simplex(A, b, c, var_num, rest_num, positive_indexes, start_var_num, start_c):
     """
     Решает каноническую задачу линейного программирования
     :param A: матрица ограничений
@@ -166,6 +167,22 @@ def simplex(A, b, c, var_num, rest_num):
     size = len(b)
     delta = np.zeros(size)
     while next(filter(lambda j: round(c[j], 16) > 0, N), 'stop') != 'stop':
+
+        solution = np.zeros(len(A[0]))
+        for i in range(len(A[0])):
+            if i in B:
+                solution[i] = b[i]
+        j = start_var_num
+        for i in list(filter(lambda x: x not in positive_indexes, range(start_var_num))):
+            solution[i] -= solution[j]
+            j += 1       
+        solution = solution[:start_var_num]
+        logging.info(solution)
+        solution_value = sum(x * y for (x, y) in zip(solution, start_c))
+        logging.info('\n')
+        logging.info(solution_value)
+        logging.info('\n')
+        
         for i in range(size):
             for j in range(size):
                 A[i][j] = round(A[i][j], 16)
@@ -189,7 +206,7 @@ def simplex(A, b, c, var_num, rest_num):
             raise ValueError('Задача неограничена')
         else:
             N, B, A, b, c, v = pivot(N, B, A, b, c, v, l, e)
-
+    
     solution = np.zeros(len(A[0]))
     for i in range(len(A[0])):
         if i in B:
@@ -198,7 +215,7 @@ def simplex(A, b, c, var_num, rest_num):
     return solution
 
 
-def get_optimal_solution(A, b, c):
+def get_optimal_solution(A, b, c, positive_indexes, start_var_num, start_c):
     num_var = len(c)
     num_rest = len(b)
     size = num_var + num_rest
@@ -215,59 +232,4 @@ def get_optimal_solution(A, b, c):
     for i in range(num_var):
         c_new[i] = c[i]
 
-    return simplex(list(A_new), list(b_new), list(c_new), num_var, rest_num=num_rest)
-
-
-# if __name__ == "__main__":
-#     # c = [-2, 3, -3]
-#     # A = [[1, 1, -1], [-1, -1, 1], [1, -2, 2]]
-#     # b = [7, -7, 4]
-#
-#     B = [3, 4, 5]
-#     N = [0, 1, 2]
-#
-#     A = [
-#         [0, 0, 0, 0, 0, 0],
-#         [0, 0, 0, 0, 0, 0],
-#         [0, 0, 0, 0, 0, 0],
-#         [1, 1, 3, 0, 0, 0],
-#         [2, 2, 5, 0, 0, 0],
-#         [4, 1, 2, 0, 0, 0]
-#     ]
-#
-#     b = [0, 0, 0, 30, 24, 36]
-#     c = [3, 1, 2, 0, 0, 0]
-#
-#     v = 0
-#     e = 0
-#     l = 5
-#
-#     # B = [3, 4]
-#     # N = [0, 1]
-#     #
-#     # A = [
-#     #     [0, 0, 0, 0],
-#     #     [0, 0, 0, 0],
-#     #     [2, -1, 0, 0],
-#     #     [1, -5, 0, 0]
-#     # ]
-#     #
-#     # b = [0, 0, 2, -4]
-#     # c = [2, -1, 0, 0]
-#     # v = 0
-#     # e = 0
-#     # l = 5
-#
-#     # solution = get_optimal_solution(A, b, c, 3, 3)
-#     # c = [2, -3, 3]
-#     # print(solution, sum(x * y for (x, y) in zip(solution, c)))
-#
-#     # c = [3, 1, 2]
-#     # A = [
-#     #     [1, 1, 3],
-#     #     [2, 2, 5],
-#     #     [4, 1, 2]
-#     # ]
-#     # b = [30, 24, 36]
-#
-#     print(simplex(A, b, c, 3, 3))
+    return simplex(list(A_new), list(b_new), list(c_new), num_var, rest_num=num_rest, positive_indexes=positive_indexes, start_var_num=start_var_num, start_c=start_c)

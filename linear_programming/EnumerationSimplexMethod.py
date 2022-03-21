@@ -225,15 +225,14 @@ def convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, posi
     new_eq_rest_num = 0
     A = []
     new_positive_indexes = []
-    for i in range(non_neg_rest_num):
+    for i in range(non_neg_rest_num + non_pos_rest_num):
         new_positive_indexes.append(i)
-        row = (np.array(rest_coefs[i])).tolist()
+        if i >= non_neg_rest_num:
+            row = (np.array(-rest_coefs[i])).tolist()
+        else:
+            row = (np.array(rest_coefs[i])).tolist()
         A.append(row)
     positive_indexes_count = len(new_positive_indexes)
-
-    for i in range(non_pos_rest_num):
-        A.append(rest_coefs[i + non_neg_rest_num])
-        new_positive_indexes.append(i + positive_indexes_count)
 
     for i in range(eq_rest_num):
         A.append(rest_coefs[i + non_neg_rest_num + non_pos_rest_num])
@@ -244,7 +243,7 @@ def convertToDual(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_num, posi
     for i in range(len(A)):
         if i in positive_indexes:
             new_rest_coefs.append(A[i])
-            new_non_neg_rest_num += 1
+            new_non_pos_rest_num += 1
         else:
             buf.append(A[i])
             new_eq_rest_num += 1

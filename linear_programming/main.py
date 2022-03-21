@@ -1,4 +1,5 @@
 from Interface import Interface
+import logging
 
 """
 Задача
@@ -20,5 +21,8 @@ from Interface import Interface
 """
 
 if __name__ == "__main__":
+    f = open("symplexMethod.log", 'w')
+    f.close()
+    logging.basicConfig(filename="symplexMethod.log", format="%(message)s", level=logging.INFO)
     interface = Interface()
     interface.main_loop()

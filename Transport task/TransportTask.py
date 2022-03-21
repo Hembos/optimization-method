@@ -106,7 +106,7 @@ class TransportTask:
 
     def create_default_task(self):
         self.storage = [19, 5, 21, 9]
-        self.destination = [12, 9, 11, 8, 6]
+        self.destination = [12, 12, 11, 8, 11]
         self.transport_cost = [
             [3, 2, 7, 11, 11],
             [2, 4, 5, 14, 8],
