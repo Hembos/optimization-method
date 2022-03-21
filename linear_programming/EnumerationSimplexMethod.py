@@ -29,7 +29,7 @@ def converse_to_canonical(var_num, non_neg_rest_num, non_pos_rest_num, eq_rest_n
     for i in range(new_neq_vars_count):
         new_func_coefs.append(0)
 
-    new_matrix = np.matrix(rest_coefs)
+    new_matrix = np.matrix(new_rest_coefs)
     # добавляем справа от неравенств единичную квадратную матрицу, оставшееся пространство заполняем нулями
     right_matrix = np.eye(new_neq_vars_count)
     if eq_rest_num > 0:
