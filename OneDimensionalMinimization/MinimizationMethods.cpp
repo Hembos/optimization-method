@@ -2,7 +2,7 @@
 
 double MinimizationMethods::dichotomyMethod(double epsilon)
 {
-
+    
     return 0;
 }
 
