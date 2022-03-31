@@ -5,14 +5,16 @@
 class Function
 {
 private:
-    double a;
-    double b;
+    double a = 0;
+    double b = 0;
 
     std::function<double(double x)> func;
 
     int callCount = 0;
 
 public:
+    Function() {}
+
     Function(std::function<double(double x)> func, double a, double b)
         : a(a), b(b), func(func) {}
 

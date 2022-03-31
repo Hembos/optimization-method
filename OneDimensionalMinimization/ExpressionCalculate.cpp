@@ -28,13 +28,13 @@ ExpressionCalculate::ExpressionCalculate(std::string expr)
     { return log(x); };
     unaryFunctions["lg"] = [](double x) -> double
     { return log10(x); };
+
+    std::queue<Token> tokens = createTokensFromExpr();
+    createPostfixNotation(tokens);
 }
 
 double ExpressionCalculate::calculate(double x)
 {
-    std::queue<Token> tokens = createTokensFromExpr();
-    createPostfixNotation(tokens);
-
     return calcExpression(x);
 }
 
