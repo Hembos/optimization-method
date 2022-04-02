@@ -21,19 +21,19 @@ private:
 class MinimizationFrame : public wxFrame
 {
 public:
-    wxStaticText* staticTextEnterFunction;
-    wxTextCtrl* editFieldEnterFunction;
+    wxStaticText *staticTextEnterFunction;
+    wxTextCtrl *editFieldEnterFunction;
 
-    wxStaticText* staticTextFunctionsLeftBorder;
-    wxStaticText* staticTextFunctionsRightBorder;
-    wxTextCtrl* editFieldFunctionsLeftBorder;
-    wxTextCtrl* editFieldFunctionsRightBorder;
+    wxStaticText *staticTextFunctionsLeftBorder;
+    wxStaticText *staticTextFunctionsRightBorder;
+    wxTextCtrl *editFieldFunctionsLeftBorder;
+    wxTextCtrl *editFieldFunctionsRightBorder;
 
-    wxStaticText* staticTextEnterEpsilon;
-    wxTextCtrl* editFieldEnterEpsilon;
+    wxStaticText *staticTextEnterEpsilon;
+    wxTextCtrl *editFieldEnterEpsilon;
 
-    wxButton* buttonSolve;
-    wxButton* buttonSolveDefault;
+    wxButton *buttonSolve;
+    wxButton *buttonSolveDefault;
 
     Function defaultFunction;
     Function nonDefaultFuntion;
@@ -43,6 +43,7 @@ public:
     MinimizationFrame();
 
     wxDECLARE_EVENT_TABLE();
+
 private:
     void OnExit(wxCommandEvent &event);
 
@@ -54,14 +55,13 @@ private:
 class MinimizationResultFrame : public wxFrame
 {
 public:
-    wxStaticText* staticTextDichotomyResult;
-    wxStaticText* staticTextGoldenResult;
+    wxStaticText *staticTextDichotomyResult;
+    wxStaticText *staticTextGoldenResult;
 
     MinimizationResultFrame(double dichotomyRes, double goldenRes);
 };
 
-enum
-{
+enum {
     ID_BUTTON_SOLVE = 10001,
     ID_BUTTON_SOLVE_DEFAULT
 };

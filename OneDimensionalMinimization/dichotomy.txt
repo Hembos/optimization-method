@@ -4,20 +4,34 @@ Iteration 0
 Interval [-5, -4]
 
 Iteration 1
-Interval [-4.51, -4]
+Interval [-4.501, -4]
 
 Iteration 2
-Interval [-4.51, -4.2499]
+Interval [-4.501, -4.25]
 
 Iteration 3
-Interval [-4.51, -4.37735]
+Interval [-4.501, -4.37525]
 
 Iteration 4
-Interval [-4.51, -4.44235]
+Interval [-4.501, -4.438]
 
 Iteration 5
-Interval [-4.51, -4.4755]
+Interval [-4.501, -4.46944]
 
-Solution -4.5012
+Iteration 6
+Interval [-4.501, -4.48519]
 
-Function call count 12
+Iteration 7
+Interval [-4.501, -4.49308]
+
+Iteration 8
+Interval [-4.49705, -4.49308]
+
+Iteration 9
+Interval [-4.49507, -4.49308]
+
+Solution -4.49358
+
+Function call count 20
+
+Theoretic function call count 19.9892
