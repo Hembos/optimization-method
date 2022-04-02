@@ -1,0 +1,23 @@
+Start didhotomy method
+
+Iteration 0
+Interval [-5, -4]
+
+Iteration 1
+Interval [-4.51, -4]
+
+Iteration 2
+Interval [-4.51, -4.2499]
+
+Iteration 3
+Interval [-4.51, -4.37735]
+
+Iteration 4
+Interval [-4.51, -4.44235]
+
+Iteration 5
+Interval [-4.51, -4.4755]
+
+Solution -4.5012
+
+Function call count 12

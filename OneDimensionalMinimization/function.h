@@ -10,9 +10,9 @@ private:
 
     std::function<double(double x)> func;
 
+public:
     int callCount = 0;
 
-public:
     Function() {}
 
     Function(std::function<double(double x)> func, double a, double b)
