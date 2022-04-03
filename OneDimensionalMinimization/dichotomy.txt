@@ -30,8 +30,29 @@ Interval [-4.49705, -4.49308]
 Iteration 9
 Interval [-4.49507, -4.49308]
 
-Solution -4.49358
+Iteration 10
+Interval [-4.49407, -4.49308]
 
-Function call count 20
+Iteration 11
+Interval [-4.49358, -4.49308]
 
-Theoretic function call count 19.9892
+Iteration 12
+Interval [-4.49358, -4.49333]
+
+Iteration 13
+Interval [-4.49345, -4.49333]
+
+Iteration 14
+Interval [-4.49345, -4.49339]
+
+Iteration 15
+Interval [-4.49342, -4.49339]
+
+Iteration 16
+Interval [-4.49342, -4.4934]
+
+Solution -4.49341
+
+Function call count 34
+
+Theoretic function call count 33.3153

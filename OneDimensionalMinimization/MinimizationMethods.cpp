@@ -67,8 +67,6 @@ double MinimizationMethods::goldenSectionMethod(double epsilon)
 
     int iterationNum = 0;
 
-    int coef = 0;
-
     while (b - a > epsilon)
     {
         logs << "\nIteration " << iterationNum << std::endl;
@@ -81,7 +79,6 @@ double MinimizationMethods::goldenSectionMethod(double epsilon)
             lambda = a + alpha * (b - a);
             fMu = fLambda;
             fLambda = targetFunction(lambda);
-            coef += 1;
         }
         else
         {
@@ -96,9 +93,8 @@ double MinimizationMethods::goldenSectionMethod(double epsilon)
     }
 
     logs << "\nSolution " << (a + b) / 2 << std::endl;
-    logs << "\nFunction call count " << targetFunction.callCount;
-    logs << "\nTheoretic function call count " << log((targetFunction.getRightBorder() - targetFunction.getLeftBorder()) / epsilon * pow(1 - alpha, coef)) / log(1 + alpha) << std::endl;
+    logs << "\nFunction call count " << targetFunction.callCount << std::endl;
+    logs << "\nTheoretic function call count " << log((targetFunction.getRightBorder() - targetFunction.getLeftBorder()) / epsilon) / log(1 / (1 - alpha)) + 1 << std::endl;
 
-    std::cout << coef << std::endl;
     return (a + b) / 2;
 }
