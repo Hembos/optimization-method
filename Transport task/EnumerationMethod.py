@@ -122,6 +122,7 @@ def enum_method(A, b, c, M, N, max=False):
     min = np.dot(best_vector, c)
     i = 1
     min_i = 1
+    vectors_min = []
     for tmp in vectors:
         current_val = np.dot(tmp, c)
         f.write("step " + str(i) + ":\n")
@@ -131,6 +132,10 @@ def enum_method(A, b, c, M, N, max=False):
             min = current_val
             best_vector = tmp
             min_i = i
+            vectors_min.clear()
+            vectors_min.append((np.array(best_vector) * mult).tolist())
+        elif current_val == min:
+            vectors_min.append((np.array(tmp) * mult).tolist())
         i += 1
     f.write("\nbest vector on step " + str(min_i) + ":\n")
     f.writelines(
@@ -140,8 +145,13 @@ def enum_method(A, b, c, M, N, max=False):
     f.writelines(map(lambda y: str(y) + ' ', best_vector))
     f.write("\nf(X) = " + str(np.dot(c, best_vector)))
 
+    mtx = np.array(vectors_min)
+    f.write("\nList of found optimal solutions:\n")
+    unique = np.unique(mtx, axis=0)
+    for i in unique:
+        line = i.tolist()
+        f.write(str(line) + '\n')
     f.close()
-
     return (np.array(best_vector) * mult).tolist(), min
 
 
