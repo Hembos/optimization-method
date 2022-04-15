@@ -1,0 +1,54 @@
+Start golden section method
+
+lambda 1.69098
+
+mu 1.80902
+
+f_lambda -2.04912
+
+f_mu -1.81426
+
+Iteration 0
+Interval [1.5, 2]
+
+Iteration 1
+Interval [1.5, 1.80902]
+
+Iteration 2
+Interval [1.61803, 1.80902]
+
+Iteration 3
+Interval [1.69098, 1.80902]
+
+Iteration 4
+Interval [1.69098, 1.76393]
+
+Iteration 5
+Interval [1.71885, 1.76393]
+
+Iteration 6
+Interval [1.71885, 1.74671]
+
+Iteration 7
+Interval [1.71885, 1.73607]
+
+Iteration 8
+Interval [1.72542, 1.73607]
+
+Iteration 9
+Interval [1.72949, 1.73607]
+
+Iteration 10
+Interval [1.72949, 1.73356]
+
+Iteration 11
+Interval [1.73104, 1.73356]
+
+Iteration 12
+Interval [1.73104, 1.7326]
+
+Solution 1.73212
+
+Function call count 14
+
+Theoretic function call count 13.9145

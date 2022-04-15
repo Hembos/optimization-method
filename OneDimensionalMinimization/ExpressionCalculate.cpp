@@ -126,7 +126,7 @@ ExpressionCalculate::TokenType ExpressionCalculate::getType(std::string const &n
         return TokenType::openBracket;
     if (name == ")")
         return TokenType::closeBracket;
-    if (name == "+" || name == "-" || name == "*" || name == "/" || name == "," || name == "~")
+    if (name == "+" || name == "-" || name == "*" || name == "/" || name == "," || name == "~" || name == "^")
         return TokenType::operation;
     if (strspn(name.c_str(), ".0123456789") == name.size())
         return TokenType::number;

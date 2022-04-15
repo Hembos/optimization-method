@@ -20,8 +20,8 @@ MinimizationFrame::MinimizationFrame()
     : wxFrame(NULL, wxID_ANY, "Одномерная минимизация", wxPoint(30, 30), wxSize(650, 500))
 {
     defaultFunction = Function([](double x)
-                               { return sin(x) * x + 2 * cos(x); },
-                               -5, -4);
+                               { return pow(x, 4) + 8 * pow(x, 3) - 6 * pow(x, 2) - 72 * x + 90; },
+                               1.5, 2);
     methods = MinimizationMethods(defaultFunction);
 
     staticTextEnterFunction = new wxStaticText(this, wxID_ANY, "Введите функцию:", wxPoint(5, 12), wxSize(150, 50));
@@ -63,7 +63,7 @@ void MinimizationFrame::OnButtonSolveClicked(wxCommandEvent &event)
         double dichotomyRes = methods.dichotomyMethod(epsilon);
         double goldenRes = methods.goldenSectionMethod(epsilon);
 
-        MinimizationResultFrame* minimizationResultFrame = new MinimizationResultFrame(dichotomyRes, goldenRes);
+        MinimizationResultFrame* minimizationResultFrame = new MinimizationResultFrame(dichotomyRes, goldenRes, epsilon);
         minimizationResultFrame->Show(true);
         event.Skip();
     }
@@ -87,7 +87,7 @@ void MinimizationFrame::OnButtonDefaultSolveClicked(wxCommandEvent &event)
         double epsilon = boost::lexical_cast<double>(epsilonStr);
         double dichotomyRes = methods.dichotomyMethod(epsilon);
         double goldenRes = methods.goldenSectionMethod(epsilon);
-        MinimizationResultFrame* minimizationResultFrame = new MinimizationResultFrame(dichotomyRes, goldenRes);
+        MinimizationResultFrame* minimizationResultFrame = new MinimizationResultFrame(dichotomyRes, goldenRes, epsilon);
         minimizationResultFrame->Show(true); 
         event.Skip();
     }
@@ -98,12 +98,14 @@ void MinimizationFrame::OnButtonDefaultSolveClicked(wxCommandEvent &event)
     }
 }
 
-MinimizationResultFrame::MinimizationResultFrame(double dichotomyRes, double goldenRes)
+MinimizationResultFrame::MinimizationResultFrame(double dichotomyRes, double goldenRes, double epsilon)
     : wxFrame(NULL, wxID_ANY, "Одномерная минимизация", wxPoint(30, 30), wxSize(650, 500))
 {
+    wxString epsilonStr = wxString::Format(wxT("Точность: %lf"), epsilon);
     wxString dichotomyResStr = wxString::Format(wxT("Метод дихотомии: %lf"), dichotomyRes);
     wxString goldenResStr = wxString::Format(wxT("Метод золотого сечения: %lf"), goldenRes);
 
+    staticTextEpsilon = new wxStaticText(this, wxID_ANY, epsilonStr, wxPoint(5, 55), wxSize(300, 25));
     staticTextDichotomyResult = new wxStaticText(this, wxID_ANY, dichotomyResStr, wxPoint(5, 5), wxSize(300, 25));
     staticTextGoldenResult = new wxStaticText(this, wxID_ANY, goldenResStr, wxPoint(5, 30), wxSize(300, 25));
 }

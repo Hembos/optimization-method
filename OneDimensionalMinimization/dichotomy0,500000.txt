@@ -1,0 +1,7 @@
+Start didhotomy method
+
+Solution 1.75
+
+Function call count 0
+
+Theoretic function call count 0

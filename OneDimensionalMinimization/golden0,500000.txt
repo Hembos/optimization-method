@@ -1,0 +1,15 @@
+Start golden section method
+
+lambda 1.69098
+
+mu 1.80902
+
+f_lambda -2.04912
+
+f_mu -1.81426
+
+Solution 1.75
+
+Function call count 2
+
+Theoretic function call count 2
