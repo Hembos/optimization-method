@@ -5,7 +5,7 @@
 double MinimizationMethods::dichotomyMethod(double epsilon)
 {
     std::ofstream logs;
-    logs.open("../dichotomy.txt");
+    logs.open("../dichotomy" + std::to_string(epsilon) + ".txt");
     logs << "Start didhotomy method" << std::endl;
 
     double a = targetFunction.getLeftBorder();
@@ -23,15 +23,10 @@ double MinimizationMethods::dichotomyMethod(double epsilon)
         double x2 = (a + b) / 2 + delta;
         double fX1 = targetFunction(x1);
         double fX2 = targetFunction(x2);
-        
+
         if (fX1 > fX2)
         {
             a = x1;
-        }
-        else if (fX1 == fX2)
-        {
-            a = x1;
-            b = x2;
         }
         else
         {
@@ -43,7 +38,7 @@ double MinimizationMethods::dichotomyMethod(double epsilon)
 
     logs << "\nSolution " << (a + b) / 2 << std::endl;
     logs << "\nFunction call count " << targetFunction.callCount << std::endl;
-    logs << "\nTheoretic function call count " << 2 * log((targetFunction.getRightBorder() - targetFunction.getLeftBorder()) / epsilon) / log(2 / 1.002);
+    logs << "\nTheoretic function call count " << 2 * log((targetFunction.getRightBorder() - targetFunction.getLeftBorder()) / epsilon) / log(2 / 1.002) + 1;
 
     return (a + b) / 2;
 }
@@ -51,7 +46,7 @@ double MinimizationMethods::dichotomyMethod(double epsilon)
 double MinimizationMethods::goldenSectionMethod(double epsilon)
 {
     std::ofstream logs;
-    logs.open("../golden.txt");
+    logs.open("../golden" + std::to_string(epsilon) + ".txt");
     logs << "Start golden section method" << std::endl;
 
     targetFunction.callCount = 0;
@@ -65,9 +60,14 @@ double MinimizationMethods::goldenSectionMethod(double epsilon)
     double fLambda = targetFunction(lambda);
     double fMu = targetFunction(mu);
 
+    logs << "\nlambda " << lambda << std::endl;
+    logs << "\nmu " << mu << std::endl;
+    logs << "\nf_lambda " << fLambda << std::endl;
+    logs << "\nf_mu " << fMu << std::endl;
+
     int iterationNum = 0;
 
-    while (b - a > epsilon)
+    while (true)
     {
         logs << "\nIteration " << iterationNum << std::endl;
         logs << "Interval " << '[' << a << ", " << b << ']' << std::endl;
@@ -78,6 +78,10 @@ double MinimizationMethods::goldenSectionMethod(double epsilon)
             mu = lambda;
             lambda = a + alpha * (b - a);
             fMu = fLambda;
+
+            if (b - a <= epsilon)
+                break;
+
             fLambda = targetFunction(lambda);
         }
         else
@@ -86,6 +90,10 @@ double MinimizationMethods::goldenSectionMethod(double epsilon)
             lambda = mu;
             fLambda = fMu;
             mu = a + (1 - alpha) * (b - a);
+
+            if (b - a <= epsilon)
+                break;
+
             fMu = targetFunction(mu);
         }
 

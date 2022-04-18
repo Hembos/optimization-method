@@ -1,0 +1,34 @@
+Start didhotomy method
+
+Iteration 0
+Interval [1.5, 2]
+
+Iteration 1
+Interval [1.5, 1.7505]
+
+Iteration 2
+Interval [1.625, 1.7505]
+
+Iteration 3
+Interval [1.68762, 1.7505]
+
+Iteration 4
+Interval [1.719, 1.7505]
+
+Iteration 5
+Interval [1.719, 1.73478]
+
+Iteration 6
+Interval [1.72687, 1.73478]
+
+Iteration 7
+Interval [1.73082, 1.73478]
+
+Iteration 8
+Interval [1.73082, 1.7328]
+
+Solution 1.73231
+
+Function call count 18
+
+Theoretic function call count 18.9834

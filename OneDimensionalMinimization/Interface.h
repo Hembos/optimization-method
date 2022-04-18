@@ -57,8 +57,9 @@ class MinimizationResultFrame : public wxFrame
 public:
     wxStaticText *staticTextDichotomyResult;
     wxStaticText *staticTextGoldenResult;
+    wxStaticText *staticTextEpsilon;
 
-    MinimizationResultFrame(double dichotomyRes, double goldenRes);
+    MinimizationResultFrame(double dichotomyRes, double goldenRes, double epsilon);
 };
 
 enum {
